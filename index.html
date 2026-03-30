@@ -1,806 +1,250 @@
-
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>CantiereE — Prototipo</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0f1117;--panel:#181c27;--panel-b:#222738;--border:#2e3347;
-  --text:#e8eaf2;--muted:#7a80a0;
-  --accent:#5b9cf6;--accent-bg:rgba(91,156,246,.12);--accent-dim:rgba(91,156,246,.25);
-  --ok:#3ecf8e;--ok-bg:rgba(62,207,142,.10);
-  --warn:#f5a623;--warn-bg:rgba(245,166,35,.10);
-  --err:#f06060;--err-bg:rgba(240,96,96,.10);
-  --r:10px;--rs:7px;
-}
-html,body{background:var(--bg);color:var(--text);font-family:var(--font-sans)}
-.page{min-height:100vh;display:flex;justify-content:center;padding:28px 16px 48px}
-.wrap{width:100%;max-width:520px;display:flex;flex-direction:column;gap:14px}
-.hdr{display:flex;align-items:center;gap:12px;margin-bottom:4px}
-.hico{width:40px;height:40px;background:var(--accent-bg);border:1px solid var(--accent-dim);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:18px}
-.ct{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px}
-.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
-.g3{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr);gap:10px}
-.f{display:flex;flex-direction:column;gap:5px}
-.lbl{font-size:11px;color:var(--muted)}
-input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;transition:border-color .15s}
-input:focus,select:focus,textarea:focus{border-color:var(--accent)}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a80a0'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
-option,optgroup{background:#1a1e2e}
-button{padding:8px 14px;border:1px solid var(--border);border-radius:var(--rs);background:transparent;cursor:pointer;font-size:13px;font-family:inherit;color:var(--text);transition:all .15s}
-button:hover{background:var(--panel-b)}button:active{transform:scale(.98)}
-.btn-acc{background:var(--accent-bg);color:var(--accent);border-color:var(--accent-dim)}
-.btn-sm{padding:4px 9px;font-size:11.5px}
-.btn-del{color:var(--err);border-color:rgba(240,96,96,.2)}
-.btn-del:hover{background:var(--err-bg)}
-.tabs{display:flex;gap:4px;margin-bottom:2px}
-.tab{flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--rs);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit;text-align:center;transition:all .15s}
-.tab.on{background:var(--accent-bg);border-color:var(--accent-dim);color:var(--accent);font-weight:500}
-.room-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
-.room-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;transition:background .15s}
-.room-hdr:hover{background:var(--panel-b)}
-.room-hdr.open{border-bottom:1px solid var(--border)}
-.room-name{font-size:14px;font-weight:500;flex:1}
-.room-cnt{font-size:11.5px;color:var(--muted);font-family:var(--font-mono)}
-.arr{font-size:11px;color:var(--muted);transition:transform .2s;display:inline-block}
-.arr.open{transform:rotate(90deg)}
-.room-body{padding:14px;display:none}
-.room-body.open{display:block}
-.item-row{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--panel-b);border-radius:var(--rs);margin-bottom:6px}
-.item-qty{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--accent);min-width:28px;text-align:right;flex-shrink:0;padding-top:1px}
-.item-type{font-size:13px;font-weight:500}
-.item-meta{font-size:11px;color:var(--muted);margin-top:2px}
-.add-form{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-top:10px}
-.add-ct{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
-.add-r2{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:8px;margin-bottom:8px}
-.add-r3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 42px;gap:8px;margin-bottom:8px}
-/* CEI 64-8 panel */
-.cei-panel{margin-top:10px;border:1px solid var(--border);border-radius:var(--rs);overflow:hidden}
-.cei-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;background:var(--panel-b);border-bottom:1px solid transparent;transition:all .15s;justify-content:space-between}
-.cei-hdr:hover{opacity:.85}
-.cei-hdr.open{border-bottom-color:var(--border)}
-.cei-title{font-size:11px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
-.cei-body{padding:12px;background:var(--panel-b);display:none}
-.cei-body.open{display:block}
-.cei-config{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr);gap:8px;margin-bottom:12px}
-.level-seg{display:flex;gap:2px}
-.lv-btn{flex:1;padding:5px 4px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;font-size:12px;font-family:var(--font-mono);color:var(--muted);transition:all .15s;font-weight:500}
-.lv-btn.on.l1{background:rgba(91,156,246,.15);color:var(--accent);border-color:var(--accent-dim)}
-.lv-btn.on.l2{background:rgba(62,207,142,.12);color:var(--ok);border-color:rgba(62,207,142,.3)}
-.lv-btn.on.l3{background:rgba(245,166,35,.12);color:var(--warn);border-color:rgba(245,166,35,.3)}
-.check-grid{display:flex;flex-direction:column;gap:6px}
-.check-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);font-size:12px}
-.check-row.ok{background:var(--ok-bg);border:1px solid rgba(62,207,142,.15)}
-.check-row.warn{background:var(--warn-bg);border:1px solid rgba(245,166,35,.15)}
-.check-row.ko{background:var(--err-bg);border:1px solid rgba(240,96,96,.15)}
-.check-row.na{background:var(--panel);border:1px solid var(--border);opacity:.6}
-.check-icon{font-size:13px;flex-shrink:0;width:18px}
-.check-label{flex:1;color:var(--text)}
-.check-counts{font-family:var(--font-mono);font-size:11.5px;text-align:right;flex-shrink:0}
-.check-counts .found{font-weight:500}
-.check-counts .req{opacity:.6}
-.cei-notes{margin-top:10px;font-size:11.5px;color:var(--muted);line-height:1.65;border-top:1px solid var(--border);padding-top:10px}
-.cei-notes b{color:var(--text);font-weight:500}
-.lvl-badge{padding:2px 8px;border-radius:99px;font-size:10px;font-weight:500;font-family:var(--font-mono)}
-.lvl-badge.l1{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-dim)}
-.lvl-badge.l2{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(62,207,142,.3)}
-.lvl-badge.l3{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(245,166,35,.3)}
-/* summary / export */
-.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}
-.stat{background:var(--panel-b);border:1px solid var(--border);border-radius:var(--rs);padding:12px}
-.stat-n{font-size:26px;font-weight:500;font-family:var(--font-mono)}
-.stat-l{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{padding:7px 10px;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:1px solid var(--border);text-align:right;background:var(--panel-b)}
-th:first-child{text-align:left}
-td{padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);font-size:12px}
-td:first-child,td:nth-child(2){text-align:left;font-family:var(--font-sans);color:var(--muted)}
-tr:last-child td{border-bottom:none}
-.export-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:14px;font-family:var(--font-mono);font-size:12px;line-height:1.9;white-space:pre-wrap;word-break:break-word;margin-bottom:12px}
-.st{border-radius:var(--rs);padding:11px 14px;font-size:12.5px;line-height:1.5;display:flex;gap:10px;align-items:flex-start}
-.st.ok{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(62,207,142,.2)}
-.st.info{background:var(--accent-bg);color:var(--accent);border:1px solid rgba(91,156,246,.2)}
-.empty{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:13px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r)}
-.sum-room-title{font-size:13px;font-weight:500;margin:14px 0 6px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.sum-item{display:flex;gap:8px;padding:5px 8px;background:var(--panel-b);border-radius:var(--rs);font-size:12px;margin-bottom:4px}
-.note-area{resize:vertical;min-height:44px;font-size:12px;margin-top:8px}
-/* Prese form */
-.cat-sel{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
-.cat-btn{padding:5px 11px;border:1px solid var(--border);border-radius:99px;background:transparent;cursor:pointer;font-size:12px;font-family:inherit;color:var(--muted);transition:all .15s}
-.cat-btn.on{background:var(--accent-bg);border-color:var(--accent-dim);color:var(--accent);font-weight:500}
-.prese-form{margin-bottom:8px}
-.posti-seg{display:flex;gap:2px;margin-bottom:8px}
-.posti-btn{flex:1;padding:8px 4px;border:1px solid var(--border);border-radius:var(--rs);background:transparent;cursor:pointer;font-size:13px;font-family:var(--font-mono);color:var(--muted);font-weight:500;transition:all .15s}
-.posti-btn.on{background:var(--accent-bg);border-color:var(--accent-dim);color:var(--accent)}
-.ip55-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--panel-b);border-radius:var(--rs);cursor:pointer;margin-top:6px;font-size:12px;color:var(--muted);transition:background .15s;user-select:none}
-.ip55-row:hover{background:var(--border)}
-.ip55-row.on{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);color:var(--warn)}
-.ip55-box{width:16px;height:16px;border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .15s}
-.ip55-box.on{background:var(--warn-bg);border-color:rgba(245,166,35,.4);color:var(--warn)}
+:root{--bg:#F7F8FA;--card:#FFF;--pri:#1565C0;--pri-dk:#0D47A1;--acc:#FF8F00;--txt:#1A1A2E;--txt2:#5C6370;--brd:#E2E6EA;--grn:#2E7D32;--grn-bg:#E8F5E9;--org:#E65100;--org-bg:#FFF3E0;--pri-lt:#E3F2FD}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'IBM Plex Sans',-apple-system,sans-serif;background:#E8E8E8;color:var(--txt);overflow:hidden;height:100dvh}
+#app{max-width:430px;margin:0 auto;height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(0,0,0,.15)}
+.hdr{background:var(--pri-dk);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:100}
+.hdr-bk{background:0 0;border:none;padding:4px;cursor:pointer;display:flex;color:#fff}
+.hdr-t{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.hdr-s{font-size:12px;opacity:.8;font-weight:400}
+.hdr-r{margin-left:auto}
+.hdr-btn{background:rgba(255,255,255,.15);border:none;border-radius:12px;padding:8px 14px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.bd{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:80px;-webkit-overflow-scrolling:touch;-ms-overflow-style:none;scrollbar-width:none}
+.bd::-webkit-scrollbar{display:none}
+.tbar{display:flex;background:#fff;border-top:1px solid var(--brd);flex-shrink:0;z-index:100}
+.tb{flex:1;padding:10px 0 14px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:500;color:var(--txt2);background:0 0;border:none;cursor:pointer;position:relative;font-family:inherit}
+.tb.a{font-weight:700;color:var(--pri)}
+.tb svg{width:22px;height:22px}
+.bg{position:absolute;top:4px;right:calc(50% - 26px);background:var(--acc);color:#fff;font-size:10px;font-weight:700;border-radius:99px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.sb{display:flex;align-items:center;gap:10px;padding:12px 20px;background:#fff;border-bottom:2px solid var(--pri);position:sticky;top:0;z-index:50}
+.sb input{flex:1;border:none;outline:none;font-size:16px;font-weight:500;color:var(--txt);background:0 0;font-family:inherit}
+.sb .x{background:0 0;border:none;font-size:20px;color:var(--txt2);cursor:pointer;padding:4px}
+.sl{padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center}
+.sl-t{font-size:13px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:1px}
+.sl-c{font-size:13px;font-weight:700;color:var(--pri)}
+.lc{display:flex;align-items:center;gap:14px;padding:16px 20px;background:#fff;border-bottom:1px solid var(--brd);cursor:pointer}
+.lc:active{background:#F0F4F8}
+.la{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex-shrink:0}
+.la.h{background:var(--pri-lt);color:var(--pri)}
+.la.e{background:#F0F0F0;color:var(--txt2)}
+.ln{font-weight:700;font-size:16px}
+.ld{font-size:12px;color:var(--txt2);margin-top:2px}
+.lp{margin-left:auto;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.la2{color:var(--txt2);font-size:20px;margin-left:auto}
+.ch{display:flex;align-items:center;padding:14px 20px;background:#fff;border-bottom:1px solid var(--brd);cursor:pointer;font-weight:700;font-size:15px;gap:10px}
+.ch:active,.ch.o{background:var(--pri);color:#fff}
+.cc{font-size:12px;font-weight:500;opacity:.7}
+.ca{margin-left:auto;transition:transform .2s;font-size:18px}
+.ch.o .ca{transform:rotate(90deg)}
+.ir{display:flex;align-items:center;padding:12px 20px 12px 36px;border-bottom:1px solid var(--brd);background:#fff;gap:10px}
+.ii{flex:1;min-width:0}
+.in{font-size:14px;font-weight:500;line-height:1.3}
+.im{font-size:11px;color:var(--txt2);margin-top:2px}
+.ab{min-width:48px;height:48px;border-radius:12px;background:var(--pri);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.ab:active{background:var(--pri-dk)}
+.qc{display:flex;align-items:center;border-radius:12px;border:2px solid var(--pri);flex-shrink:0;overflow:hidden}
+.qb{width:40px;height:44px;display:flex;align-items:center;justify-content:center;background:0 0;border:none;color:var(--pri);cursor:pointer;font-weight:700;font-size:20px;font-family:inherit}
+.qb:active{background:var(--pri-lt)}
+.qv{min-width:36px;text-align:center;font-weight:700;font-size:16px;color:var(--pri)}
+.cr{display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid var(--brd);background:#fff;gap:12px;cursor:pointer}
+.cr:active{background:#F8F8F8}
+.cb{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.cb.off{border:2px solid var(--brd);background:#fff}
+.cb.on{border:none;background:var(--grn)}
+.vb{padding:6px 12px;border-radius:8px;border:1px solid var(--org);background:var(--org-bg);color:var(--org);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;font-family:inherit}
+.vg{font-size:11px;font-weight:700;color:var(--org);background:var(--org-bg);padding:2px 8px;border-radius:6px}
+.isb{padding:14px 20px;background:var(--grn-bg);display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--grn)}
+.sc{margin:12px 16px;padding:16px 20px;background:#fff;border-radius:16px;border:1px solid var(--brd)}
+.sc h3{font-size:16px;font-weight:800;margin-bottom:8px}
+.sc p{font-size:13px;color:var(--txt2);margin-top:4px}
+.cd{padding:10px 20px;background:var(--pri-lt);font-weight:700;font-size:13px;color:var(--pri-dk);text-transform:uppercase;letter-spacing:.5px}
+.sr{display:flex;padding:10px 20px;border-bottom:1px solid var(--brd);background:#fff;align-items:center}
+.sr .n{flex:1;font-size:14px;font-weight:500}
+.sr .q{font-weight:700;font-size:15px;color:var(--pri);min-width:60px;text-align:right}
+.gb{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 40px);margin:20px auto;padding:16px;border-radius:14px;background:var(--pri);color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+.gb:active{background:var(--pri-dk)}
+.fab{position:absolute;bottom:90px;right:20px;width:60px;height:60px;border-radius:20px;background:var(--acc);color:#fff;border:none;box-shadow:0 6px 24px rgba(255,143,0,.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:90}
+.fab:active{transform:scale(.93)}
+.tst{position:absolute;bottom:110px;left:50%;transform:translateX(-50%);background:var(--pri-dk);color:#fff;padding:12px 24px;border-radius:14px;font-size:14px;font-weight:600;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.25);pointer-events:none;white-space:nowrap;animation:ti .2s ease-out}
+@keyframes ti{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.mo{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+.mc{width:100%;max-height:80vh;background:#fff;border-radius:24px 24px 0 0;overflow:auto;padding:24px 20px 40px}
+.mt{font-size:18px;font-weight:800;margin-bottom:16px;color:var(--pri-dk)}
+.ms{font-size:13px;color:var(--txt2);margin-bottom:16px}
+.fl{font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:6px}
+.cg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.cp{padding:10px 16px;border-radius:10px;border:1px solid var(--brd);background:#fff;color:var(--txt);font-weight:500;font-size:14px;cursor:pointer;font-family:inherit}
+.cp.s{border:2px solid var(--pri);background:var(--pri-lt);color:var(--pri);font-weight:700}
+.mi{width:100%;padding:14px 16px;border-radius:12px;border:2px solid var(--brd);font-size:15px;font-weight:500;color:var(--txt);outline:none;margin-bottom:12px;font-family:inherit}
+.mi:focus{border-color:var(--pri)}
+.msv{width:100%;padding:16px;border-radius:14px;background:var(--pri);color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;font-family:inherit}
+.es{padding:60px 40px;text-align:center;color:var(--txt2)}
+.es .ei{font-size:48px;margin-bottom:12px}
+.es .et{font-weight:600;font-size:16px}
+.es .ed{font-size:13px;margin-top:4px}
 </style>
-
-<div class="page"><div class="wrap">
-
-<div class="hdr">
-  <div class="hico">&#128221;</div>
-  <div>
-    <div style="font-size:17px;font-weight:500" id="h-title">Sopralluogo elettrico</div>
-    <div style="font-size:11px;color:var(--muted);margin-top:2px" id="h-sub">CEI 64-8 Sez.37 · impianto civile</div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="ct">Dati progetto</div>
-  <div class="g2" style="margin-bottom:10px">
-    <div class="f"><div class="lbl">Progetto / indirizzo</div><input id="p-name" placeholder="Via Roma 1, Milano" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
-    <div class="f"><div class="lbl">Tecnico</div><input id="p-tech" placeholder="Mario Rossi" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
-  </div>
-  <div class="g3">
-    <div class="f"><div class="lbl">Cliente</div><input id="p-client" placeholder="Nome cliente" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
-    <div class="f"><div class="lbl">Data</div><input id="p-date" type="date" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
-    <div class="f"><div class="lbl">Rif. #</div><input id="p-ref" placeholder="001" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
-  </div>
-</div>
-
-<div class="tabs">
-  <button class="tab on" onclick="showV('survey',this)">Rilievo</button>
-  <button class="tab" onclick="showV('summary',this)">Riepilogo</button>
-  <button class="tab" onclick="showV('export',this)">Esporta</button>
-</div>
-
-<div id="v-survey">
-  <div class="card" style="padding:14px">
-    <div class="ct" style="margin-bottom:10px">Aggiungi locale</div>
-    <div style="display:flex;gap:8px;margin-bottom:0">
-      <select id="sel-room" style="flex:1">
-        <option value="">— locale preimpostato —</option>
-        <optgroup label="Zone giorno">
-          <option>Ingresso</option><option>Corridoio</option><option>Soggiorno</option>
-          <option>Sala da pranzo</option><option>Cucina</option><option>Cucina / pranzo</option>
-          <option>Lavanderia</option><option>Ripostiglio</option>
-        </optgroup>
-        <optgroup label="Zone notte">
-          <option>Camera da letto</option><option>Camera 2</option><option>Camera 3</option>
-          <option>Cameretta</option><option>Studio / ufficio</option>
-          <option>Bagno</option><option>Bagno 2</option><option>Bagno padronale</option>
-          <option>WC</option>
-        </optgroup>
-        <optgroup label="Esterni / tecnico">
-          <option>Terrazzo</option><option>Balcone</option><option>Giardino</option>
-          <option>Garage</option><option>Cantina / locale tecnico</option>
-          <option>Quadro elettrico generale</option>
-        </optgroup>
-      </select>
-      <input id="inp-room" placeholder="oppure nome libero" style="flex:1;font-size:12px;padding:6px 8px">
-      <button class="btn-acc" onclick="addRoom()">+ Locale</button>
-    </div>
-  </div>
-  <div id="rooms-list"></div>
-  <div id="rooms-empty" class="empty">Nessun locale aggiunto — inizia dal menu sopra.</div>
-</div>
-
-<div id="v-summary" style="display:none">
-  <div class="stat-grid" id="sum-stats"></div>
-  <div class="card" style="padding:0 0 2px">
-    <div style="padding:12px 14px 8px"><div class="ct" style="margin:0">Quantità per tipo</div></div>
-    <table><thead><tr><th>Elemento</th><th>Locali</th><th>Tot.</th></tr></thead>
-    <tbody id="sum-types"></tbody></table>
-  </div>
-  <div id="sum-rooms-wrap"></div>
-</div>
-
-<div id="v-export" style="display:none">
-  <div class="card">
-    <div class="ct">Documento da condividere</div>
-    <div class="export-box" id="export-box"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn-acc" onclick="copyTxt()">Copia testo</button>
-      <button onclick="sendPrompt('Analizza questo sopralluogo e suggerisci il materiale da ordinare con quantità: \n' + getExport())">Suggerisci materiale ↗</button>
-      <button onclick="sendPrompt('Elabora un preventivo di massima per questo sopralluogo impianto elettrico civile: \n' + getExport())">Preventivo ↗</button>
-    </div>
-    <div id="copy-ok" style="font-size:12px;color:var(--ok);margin-top:8px;display:none">Copiato negli appunti</div>
-  </div>
-</div>
-
-</div></div>
-
+</head>
+<body>
+<div id="app"></div>
 <script>
-// ── CEI 64-8 Sez. 37 — Tabella A Dotazioni minime ─────────────────────────
-// Fonte: CEI 64-8/3:2024, Allegato A (V3 + edizione 2024)
-// Struttura: {prese:[L1,L2,L3], luce:[L1,L2,L3], notes:'...'}
-// Per Camera/Soggiorno/Studio: dipende dalla superficie → keys s1/s2/s3
-// s1: 8≤A≤12m², s2: 12<A≤20m², s3: A>20m²
+const C=[{cat:"Protezioni",items:[{id:"p1",nome:"Int. magnetotermico 1P+N C10",norma:"CEI EN 60898-1",um:"pz"},{id:"p2",nome:"Int. magnetotermico 1P+N C16",norma:"CEI EN 60898-1",um:"pz"},{id:"p3",nome:"Int. magnetotermico 1P+N C20",norma:"CEI EN 60898-1",um:"pz"},{id:"p4",nome:"Int. magnetotermico 1P+N C25",norma:"CEI EN 60898-1",um:"pz"},{id:"p5",nome:"Diff.le 2P 25A 30mA tipo A",norma:"CEI EN 61008-1",um:"pz"},{id:"p6",nome:"Diff.le 2P 40A 30mA tipo A",norma:"CEI EN 61008-1",um:"pz"},{id:"p7",nome:"SPD Tipo 2",norma:"CEI EN 61643-11",um:"pz"}]},{cat:"Cavi",items:[{id:"c1",nome:"FG16OR16 3G1,5",norma:"CEI 20-13",um:"m"},{id:"c2",nome:"FG16OR16 3G2,5",norma:"CEI 20-13",um:"m"},{id:"c3",nome:"FG16OR16 5G2,5",norma:"CEI 20-13",um:"m"},{id:"c4",nome:"FG16OR16 5G4",norma:"CEI 20-13",um:"m"},{id:"c5",nome:"N07V-K 1G1,5 (G/V)",norma:"CEI 20-22",um:"m"},{id:"c6",nome:"N07V-K 1G2,5 (G/V)",norma:"CEI 20-22",um:"m"},{id:"c7",nome:"Cavo dati UTP Cat.6",norma:"CEI EN 50173",um:"m"}]},{cat:"Frutti e placche",items:[{id:"f1",nome:"Presa 2P+T 10/16A",norma:"CEI 23-50",um:"pz"},{id:"f2",nome:"Presa Schuko 2P+T 16A",norma:"CEI 23-50",um:"pz"},{id:"f3",nome:"Interruttore 1P 10A",norma:"CEI 23-9",um:"pz"},{id:"f4",nome:"Deviatore 1P 10A",norma:"CEI 23-9",um:"pz"},{id:"f5",nome:"Pulsante 1P 10A NO",norma:"CEI 23-9",um:"pz"},{id:"f6",nome:"Presa TV passante",norma:"CEI EN 50083",um:"pz"},{id:"f7",nome:"Presa RJ45 Cat.6",norma:"CEI EN 50173",um:"pz"},{id:"f8",nome:"Placca 3 moduli",norma:"",um:"pz"},{id:"f9",nome:"Placca 4 moduli",norma:"",um:"pz"}]},{cat:"Scatole e tubi",items:[{id:"s1",nome:"Scatola incasso 503 (3 mod)",norma:"CEI 23-48",um:"pz"},{id:"s2",nome:"Scatola incasso 504 (4 mod)",norma:"CEI 23-48",um:"pz"},{id:"s3",nome:"Scatola derivazione 100x100",norma:"CEI 23-48",um:"pz"},{id:"s4",nome:"Tubo corrugato ø20",norma:"CEI EN 61386",um:"m"},{id:"s5",nome:"Tubo corrugato ø25",norma:"CEI EN 61386",um:"m"},{id:"s6",nome:"Tubo rigido PVC ø20",norma:"CEI EN 61386",um:"m"}]},{cat:"Quadri",items:[{id:"q1",nome:"Centralino incasso 12 mod",norma:"CEI EN 61439-3",um:"pz"},{id:"q2",nome:"Centralino incasso 24 mod",norma:"CEI EN 61439-3",um:"pz"},{id:"q3",nome:"Centralino parete 12 mod IP40",norma:"CEI EN 61439-3",um:"pz"},{id:"q4",nome:"Barra DIN 35mm",norma:"CEI EN 60715",um:"pz"}]},{cat:"Illuminazione",items:[{id:"l1",nome:"Punto luce a soffitto",norma:"",um:"pz"},{id:"l2",nome:"Punto luce a parete",norma:"",um:"pz"},{id:"l3",nome:"Faretto incasso LED",norma:"CEI EN 60598",um:"pz"},{id:"l4",nome:"Plafoniera LED",norma:"CEI EN 60598",um:"pz"},{id:"l5",nome:"Lampada emergenza SE",norma:"CEI EN 60598-2-22",um:"pz"}]}];
+const L=[{id:"loc1",nome:"Ingresso"},{id:"loc2",nome:"Soggiorno"},{id:"loc3",nome:"Cucina"},{id:"loc4",nome:"Camera da letto"},{id:"loc5",nome:"Bagno"},{id:"loc6",nome:"Quadro generale"}];
+const MK=["ABB","BTicino","Schneider","Gewiss","Vimar","Siemens","Hager","Finder"];
+const I={bk:'<polyline points="15 18 9 12 15 6"/>',cl:'<rect x="9" y="2" width="6" height="4" rx="1"/><path d="M4 6h16v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/><path d="M9 14l2 2 4-4"/>',ck:'<polyline points="20 6 9 17 4 12"/>',pl:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',se:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',dc:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>',cm:'<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>',sw:'<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>'};
+const sv=(d,z=22,c="currentColor")=>`<svg width="${z}" height="${z}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 
-var CEI = {
-  'camera':    {label:'Camera/Soggiorno/Studio', hasSurface:true,
-    prese:{s1:[4,5,5], s2:[5,7,8], s3:[6,8,10]},
-    luce: {s1:[1,2,3], s2:[1,2,3], s3:[1,4,4]},
-    tv:   {s1:[1,1,1], s2:[1,1,1], s3:[1,1,2]},
-    tel:  {s1:[1,1,1], s2:[1,1,1], s3:[1,1,1]},
-    notes:'Almeno 1 presa vicino alla porta (consigliato). Presa TV deve avere predisposizione per 6 prese energia. I punti luce a soffitto possono essere sostituiti da prese comandate.'
-  },
-  'cucina':    {label:'Cucina (con spazio pranzo)', hasSurface:false,
-    prese:{base:[4,6,7]}, preseExtra:{base:[2,2,3]},
-    luce: {base:[1,2,2]},
-    tv:   {base:[1,1,1]},
-    tel:  {base:[0,0,0]},
-    notes:'Le prese "extra" (*) sono riservate a grandi elettrodomestici (cappa, lavastoviglie, frigorifero). Predisporre presa per elettrovalvola gas. Almeno 1 presa P30 (Schuko). Circuito dedicato per piano cottura a induzione (L3).'
-  },
-  'angolo':    {label:'Angolo cottura', hasSurface:false,
-    prese:{base:[2,2,3]}, preseExtra:{base:[1,1,2]},
-    luce: {base:[1,1,1]},
-    tv:   {base:[0,0,0]},
-    tel:  {base:[0,0,0]},
-    notes:'Dotazioni ridotte rispetto alla cucina completa. Prese extra riservate a frigorifero e piano cottura.'
-  },
-  'ingresso':  {label:'Ingresso', hasSurface:false,
-    prese:{base:[1,1,1]},
-    luce: {base:[1,1,1]},
-    tv:   {base:[0,0,0]},
-    tel:  {base:[0,1,1]},
-    notes:'Punto luce obbligatorio vicino alla porta. Presa vicino alla porta (consigliata). Campanello obbligatorio per L1; videocitofono da L2.'
-  },
-  'corridoio': {label:'Corridoio', hasSurface:true,
-    prese:{s1:[1,1,1], s2:[1,1,2], s3:[1,1,2]},
-    luce: {s1:[1,1,1], s2:[1,1,1], s3:[1,1,2]},
-    tv:   {s1:[0,0,0], s2:[0,0,0], s3:[0,0,0]},
-    tel:  {s1:[0,0,0], s2:[0,0,0], s3:[0,0,0]},
-    notes:'Lunghezza ≤5m: s1. Lunghezza >5m: s2/s3. Punto luce con interruttore vicino alla porta.'
-  },
-  'bagno':     {label:'Bagno (con lavatrice)', hasSurface:false,
-    prese:{base:[2,2,2]},
-    luce: {base:[2,2,2]},
-    tv:   {base:[0,0,0]},
-    tel:  {base:[0,0,0]},
-    notes:'1 presa rasoi zona 3 (SELV 12V o trafo isolamento) + 1 presa lavatrice. 2 punti luce (soffitto + specchio). Se assente lavatrice: 1 presa. Differenziale tipo A (o F) consigliato per il circuito lavatrice.'
-  },
-  'wc':        {label:'WC / bagno senza lavatrice', hasSurface:false,
-    prese:{base:[1,1,1]},
-    luce: {base:[1,1,1]},
-    tv:   {base:[0,0,0]},
-    tel:  {base:[0,0,0]},
-    notes:'1 presa rasoi (zona 3, SELV o trafo isolamento). 1 punto luce.'
-  },
-  'lavanderia':{label:'Lavanderia / locale tecnico', hasSurface:false,
-    prese:{base:[4,4,4]},
-    luce: {base:[1,1,1]},
-    tv:   {base:[0,0,0]},
-    tel:  {base:[0,0,0]},
-    notes:'Prese dedicate per: lavatrice, asciugatrice, pompa calore ACS, altri elettrodomestici. Differenziale tipo A (o F) consigliato.'
-  },
-  'balcone':   {label:'Balcone / terrazzo', hasSurface:false,
-    prese:{base:[1,1,1]},
-    luce: {base:[1,1,1]},
-    tv:   {base:[0,0,0]},
-    tel:  {base:[0,0,0]},
-    notes:'Prese IP44. Punto luce esterno con spia di segnalazione (il comando è all\'interno e non visibile direttamente).'
-  },
-  'giardino':  {label:'Giardino / zona esterna', hasSurface:false,
-    prese:{base:[1,1,2]},
-    luce: {base:[1,1,2]},
-    tv:   {base:[0,0,0]},
-    tel:  {base:[0,0,0]},
-    notes:'Prese IP55 (uso esterno). Circuito protetto da differenziale 30mA.'
-  },
-  'ripostiglio':{label:'Ripostiglio / cantina', hasSurface:false,
-    prese:{base:[1,1,1]},
-    luce: {base:[1,1,1]},
-    tv:   {base:[0,0,0]},
-    tel:  {base:[0,0,0]},
-    notes:'Dotazione minima identica per tutti i livelli.'
-  },
-  'garage':    {label:'Garage / box auto', hasSurface:false,
-    prese:{base:[1,1,2]},
-    luce: {base:[1,1,1]},
-    tv:   {base:[0,0,0]},
-    tel:  {base:[0,0,0]},
-    notes:'Predisposizione ricarica veicoli elettrici raccomandata da L2 (CEI 64-8:2024). Prese IP44.'
-  },
-};
+let S={scr:"locali",mod:1,loc:null,co:null,q:"",mat:{},inst:{},ml:null};
+const $=id=>document.getElementById(id);
+const gmc=id=>(S.mat[id]||[]).reduce((s,m)=>s+m.qty,0);
+const gtm=()=>Object.values(S.mat).flat().reduce((s,m)=>s+m.qty,0);
+const gti=()=>Object.keys(S.inst).length;
+const glic=id=>Object.keys(S.inst).filter(k=>k.startsWith(id+"_")).length;
+const fi=id=>C.flatMap(c=>c.items).find(i=>i.id===id);
 
-// Mappatura nomi locali → tipo CEI
-var ROOM_MAP = {
-  'Ingresso':'ingresso','Corridoio':'corridoio',
-  'Soggiorno':'camera','Sala da pranzo':'camera',
-  'Cucina':'cucina','Cucina / pranzo':'cucina',
-  'Lavanderia':'lavanderia','Ripostiglio':'ripostiglio',
-  'Camera da letto':'camera','Camera 2':'camera','Camera 3':'camera',
-  'Cameretta':'camera','Studio / ufficio':'camera',
-  'Bagno':'bagno','Bagno 2':'bagno','Bagno padronale':'bagno','WC':'wc',
-  'Terrazzo':'balcone','Balcone':'balcone','Giardino':'giardino',
-  'Garage':'garage','Cantina / locale tecnico':'ripostiglio',
-  'Quadro elettrico generale':null,
-};
+function am(lid,iid){const it=fi(iid);if(!it)return;if(!S.mat[lid])S.mat[lid]=[];const e=S.mat[lid].find(m=>m.id===iid);if(e)e.qty++;else S.mat[lid].push({...it,qty:1});R();T("+ "+it.nome)}
+function uq(lid,iid,d){const a=S.mat[lid]||[];const m=a.find(x=>x.id===iid);if(m){m.qty=Math.max(0,m.qty+d);if(m.qty===0)S.mat[lid]=a.filter(x=>x.id!==iid)}R()}
+function ti2(lid,iid){const k=lid+"_"+iid;if(S.inst[k])delete S.inst[k];else{const o=(S.mat[lid]||[]).find(m=>m.id===iid);S.inst[k]={...o,marchio:"",modello:"",variante:false}}R()}
+function sv2(lid,iid,d){const k=lid+"_"+iid;if(S.inst[k])Object.assign(S.inst[k],d,{variante:true});R()}
 
-// Prese: tipi normalizzati
-var PRESA_TIPI = [
-  'Presa 2P+T 10A',
-  'Presa 2P+T 16A',
-  'Presa bipasso 2P+T 10/16A',
-  'Presa UNEL 2P+T 10/16A',
-];
-var PRESA_POSTI = ['3','4','6/7'];
+let tt;function T(m){clearTimeout(tt);const e=document.createElement("div");e.className="tst";e.textContent=m;$("app").appendChild(e);tt=setTimeout(()=>e.remove(),2000)}
 
-var TYPES = {
-  'Prese':[], // gestite separatamente con form dedicato
-  'Comandi':['Interruttore 10A','Deviatore 10A','Invertitore 10A','Pulsante NA','Pulsante NC','Dimmer rotativo','Dimmer a pulsante','Interruttore bipolare 16A','Deviatore con spia','Commutatore'],
-  'Punti luce':['Punto luce soffitto','Punto luce parete','Punto luce incasso','Punto luce esterno IP44','Faretto orientabile','Strip LED','Apparecchio emergenza','Segnapasso'],
-  'Protezioni QE':['Int. mag-term. 1P','Int. mag-term. 2P','Int. mag-term. 3P+N','Differenziale tipo A','Differenziale tipo F','Differenziale tipo AC','SPD scaricatore'],
-  'Sicurezza':['Rilevatore fumo','Rilevatore gas','Rilevatore CO','PIR movimento','Rilevatore allagamento','Sirena interna','Sirena esterna','Tastiera allarme','Contatto porta','Contatto finestra','Telecamera IP','Videocitofono','Citofono audio'],
-  'Impianto speciale':['Termostato','Cronotermostato','Unità interna AC','Unità esterna AC','Pompa di calore','Punto ricarica EV 7kW','Punto ricarica EV 22kW'],
-  'Canalizzazione':['Cassetta derivazione 503','Corrugato 16mm','Corrugato 20mm','Corrugato 25mm','Tubo rigido 20mm','Canale PVC 40x25','Canale PVC 60x40','Scatola incasso 503'],
-};
+function R(){
+  const scr=S.scr,mod=S.mod;let ht="",hts="",sb=false,pb=false;
+  if(scr==="locali"){ht=mod===1?"Sopralluogo":"Tracciamento installato";hts="Appartamento Rossi · Via Roma 15"}
+  else if(scr==="catalogo"){ht=S.loc.nome;hts="Seleziona materiali";sb=pb=true}
+  else if(scr==="installato"){ht=S.loc.nome;hts="Conferma installazione";sb=true}
+  else if(scr==="riepilogo"){ht="Lista acquisti";hts="Riepilogo completo";sb=true}
 
-var st={rooms:[],open:{},ceiOpen:{}}, rId=1, iId=1;
+  let h=`<div class="hdr">`;
+  if(sb)h+=`<button class="hdr-bk" onclick="GB()">${sv(I.bk,24,"#fff")}</button>`;
+  h+=`<div><div class="hdr-t">${ht}</div><div class="hdr-s">${hts}</div></div>`;
+  if(pb)h+=`<div class="hdr-r"><button class="hdr-btn" onclick="GS('riepilogo')">${sv(I.dc,16,"#fff")} PDF</button></div>`;
+  h+=`</div><div class="bd">`;
 
-async function load(){
-  try{
-    var r=await window.storage.get('sopr-v3');
-    if(r&&r.value){
-      var d=JSON.parse(r.value);
-      st=d.st||st;rId=d.rId||1;iId=d.iId||1;
-      var p=d.p||{};
-      el('p-name').value=p.name||'';el('p-tech').value=p.tech||'';
-      el('p-client').value=p.client||'';el('p-date').value=p.date||'';el('p-ref').value=p.ref||'';
-      updHdr();
-    }
-  }catch(e){}
-  renderRooms();
+  if(scr==="locali")h+=rL();
+  else if(scr==="catalogo")h+=rC();
+  else if(scr==="installato")h+=rI();
+  else if(scr==="riepilogo")h+=rR();
+  h+=`</div>`;
+
+  if(scr==="catalogo"||scr==="installato")h+=`<button class="fab" onclick="T('📸 Foto salvata per ${S.loc?.nome||""}')">${sv(I.cm,28,"#fff")}</button>`;
+
+  const tm=gtm(),ti=gti();
+  h+=`<div class="tbar">`;
+  h+=`<button class="tb ${mod===1&&scr!=="riepilogo"?"a":""}" onclick="SM(1)">${sv(I.cl,22)}${tm?`<span class="bg">${tm}</span>`:""}<span>Sopralluogo</span></button>`;
+  h+=`<button class="tb ${mod===2?"a":""}" onclick="SM(2)">${sv(I.ck,22)}${ti?`<span class="bg">${ti}</span>`:""}<span>Installato</span></button>`;
+  h+=`<button class="tb ${scr==="riepilogo"?"a":""}" onclick="GS('riepilogo')">${sv(I.dc,22)}<span>Documenti</span></button>`;
+  h+=`</div>`;
+
+  $("app").innerHTML=h;
+  if(S.ml)rM();
+  if(scr==="catalogo"){const inp=document.querySelector(".sb input");if(inp&&S.q){inp.value=S.q}}
 }
 
-async function save(){
-  updHdr();
-  try{
-    await window.storage.set('sopr-v3',JSON.stringify({
-      st:st,rId:rId,iId:iId,
-      p:{name:gv('p-name'),tech:gv('p-tech'),client:gv('p-client'),date:gv('p-date'),ref:gv('p-ref')}
-    }));
-  }catch(e){}
-}
-
-function updHdr(){
-  el('h-title').textContent=gv('p-name')||'Sopralluogo elettrico';
-  var p=[];
-  if(gv('p-client'))p.push(gv('p-client'));
-  if(gv('p-date')){var d=new Date(gv('p-date'));if(!isNaN(d))p.push(d.toLocaleDateString('it-IT'));}
-  el('h-sub').textContent=p.join(' · ')||'CEI 64-8 Sez.37 · impianto civile';
-}
-
-function el(id){return document.getElementById(id);}
-function gv(id){var e=el(id);return e?e.value:'';}
-
-function showV(v,btn){
-  ['v-survey','v-summary','v-export'].forEach(function(id){el(id).style.display=id==='v-'+v?'':'none';});
-  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
-  btn.classList.add('on');
-  if(v==='summary')renderSummary();
-  if(v==='export')renderExport();
-}
-
-function addRoom(){
-  var sel=gv('sel-room'),custom=gv('inp-room').trim();
-  var name=custom||sel;if(!name){el('inp-room').focus();return;}
-  var id=rId++;
-  var ceiType=ROOM_MAP[name]||null;
-  st.rooms.push({id:id,name:name,items:[],note:'',ceiType:ceiType,ceiSurf:'s2',ceiLv:1,ceiOpen:false});
-  st.open[id]=true;
-  el('sel-room').value='';el('inp-room').value='';
-  save();renderRooms();
-}
-
-function delRoom(id){
-  if(!confirm('Eliminare il locale e tutti gli elementi?'))return;
-  st.rooms=st.rooms.filter(function(r){return r.id!==id;});
-  save();renderRooms();
-}
-
-function togRoom(id){st.open[id]=!st.open[id];renderRooms();}
-function togCei(id){
-  var room=st.rooms.find(function(r){return r.id===id;});
-  if(room){room.ceiOpen=!room.ceiOpen;save();renderRooms();}
-}
-
-function setCeiType(rid,val){
-  var room=st.rooms.find(function(r){return r.id===rid;});
-  if(room){room.ceiType=val||null;save();renderRooms();}
-}
-function setCeiSurf(rid,val){
-  var room=st.rooms.find(function(r){return r.id===rid;});
-  if(room){room.ceiSurf=val;save();renderRooms();}
-}
-function setCeiLv(rid,lv){
-  var room=st.rooms.find(function(r){return r.id===rid;});
-  if(room){room.ceiLv=lv;save();renderRooms();}
-}
-
-function addItem(rid){
-  var cat=gv('it-cat-'+rid);
-  var type='';
-  if(cat==='Prese'){
-    var postiEl=document.querySelector('#it-posti-'+rid+' .posti-btn.on');
-    var tipoEl=ge('it-ptipo-'+rid);
-    var ip55El=ge('it-ip55-'+rid);
-    var posti=postiEl?postiEl.dataset.v:'';
-    var ptipo=tipoEl?tipoEl.value:'';
-    if(!posti||!ptipo){if(!posti&&postiEl===null){alert('Seleziona il numero di posti.');}else if(!ptipo){ge('it-ptipo-'+rid).focus();}return;}
-    type=posti+'P — '+ptipo;
-    if(ip55El&&ip55El.dataset.on==='1') type+=' [IP55]';
-  } else {
-    type=gv('it-type-'+rid);
-    if(!type){el('it-type-'+rid).focus();return;}
-  }
-  var qty=Math.max(1,parseInt(gv('it-qty-'+rid))||1);
-  var brand=gv('it-brand-'+rid).trim(),model=gv('it-model-'+rid).trim(),note=gv('it-note-'+rid).trim();
-  var room=st.rooms.find(function(r){return r.id===rid;});if(!room)return;
-  room.items.push({id:iId++,type:type,qty:qty,brand:brand,model:model,note:note});
-  save();renderRooms();
-}
-
-function delItem(rid,iid){
-  var room=st.rooms.find(function(r){return r.id===rid;});if(!room)return;
-  room.items=room.items.filter(function(i){return i.id!==iid;});
-  save();renderRooms();
-}
-function saveNote(rid,val){var room=st.rooms.find(function(r){return r.id===rid;});if(room){room.note=val;save();}}
-
-function togPosti(rid,val,btn){
-  document.querySelectorAll('#it-posti-'+rid+' .posti-btn').forEach(function(b){b.classList.remove('on');});
-  btn.classList.add('on');
-}
-function togIP55(rid){
-  var el_=ge('it-ip55-'+rid);
-  var on=el_.dataset.on==='1';
-  el_.dataset.on=on?'0':'1';
-  el_.className='ip55-row'+(on?'':' on');
-  el_.querySelector('.ip55-box').className='ip55-box'+(on?'':' on');
-  el_.querySelector('.ip55-box').textContent=on?'':'✓';
-  el_.querySelector('.ip55-lbl').textContent=on?'IP55 — non spuntato':'IP55 — installazione stagna';
-}
-function setItemCat(rid,cat,btn){
-  document.querySelectorAll('#it-catrow-'+rid+' .cat-btn').forEach(function(b){b.classList.remove('on');});
-  btn.classList.add('on');
-  ge('it-cat-'+rid).value=cat;
-  ge('it-prese-form-'+rid).style.display=cat==='Prese'?'':'none';
-  ge('it-other-form-'+rid).style.display=cat==='Prese'?'none':'';
-  if(cat!=='Prese'){
-    var sel=ge('it-type-'+rid);
-    sel.innerHTML='<option value="">— tipo elemento —</option>';
-    if(TYPES[cat]){TYPES[cat].forEach(function(t){var o=document.createElement('option');o.textContent=t;sel.appendChild(o);});}
-  }
-}
-
-// ── Build opts for non-prese categories ──────────────────────────────────────
-function buildNonPreseOpts(){
-  var h='<option value="">— tipo elemento —</option>';
-  Object.keys(TYPES).forEach(function(cat){
-    if(cat==='Prese')return;
-    h+='<optgroup label="'+cat+'">';
-    TYPES[cat].forEach(function(t){h+='<option>'+t+'</option>';});
-    h+='</optgroup>';
+function rL(){
+  let h=`<div class="sl"><div class="sl-t">${S.mod===1?"Seleziona locale":"Stato installazione"}</div><div class="sl-c">${S.mod===1?gtm()+" articoli":gti()+" installati"}</div></div>`;
+  L.forEach(l=>{
+    const mc=gmc(l.id),ic=glic(l.id),ml=(S.mat[l.id]||[]).length;
+    h+=`<div class="lc" onclick="SL('${l.id}')"><div class="la ${mc?"h":"e"}">${l.nome[0]}</div><div><div class="ln">${l.nome}</div><div class="ld">${mc?mc+" mat.":"Nessun materiale"}${S.mod===2&&mc?" · "+ic+"/"+ml+" installati":""}</div></div>`;
+    if(S.mod===2&&mc){const p=ml?Math.round(ic/ml*100):0,dn=ic===ml&&ml;h+=`<div class="lp" style="background:${dn?"var(--grn-bg)":"#F0F0F0"};color:${dn?"var(--grn)":"var(--txt2)"}">${dn?sv(I.ck,20,"var(--grn)"):p+"%"}</div>`}
+    if(S.mod===1)h+=`<div style="margin-left:auto;font-size:13px;font-weight:600;color:var(--txt2)">${mc||""}</div>`;
+    h+=`<span class="la2">›</span></div>`;
   });
   return h;
 }
 
-function buildAddForm(rid){
-  var cats=['Prese','Comandi','Punti luce','Protezioni QE','Sicurezza','Impianto speciale','Canalizzazione'];
-  var h='<div class="add-form">';
-  h+='<div class="add-ct">Aggiungi elemento</div>';
-  // Category selector
-  h+='<div class="cat-sel" id="it-catrow-'+rid+'">';
-  cats.forEach(function(c,i){
-    h+='<button class="cat-btn'+(i===0?' on':'')+'" onclick="setItemCat('+rid+',\''+c+'\',this)">'+c+'</button>';
-  });
-  h+='</div>';
-  h+='<input type="hidden" id="it-cat-'+rid+'" value="Prese">';
+function rC(){
+  const lid=S.loc.id,lm=S.mat[lid]||[];
+  const gq=id=>(lm.find(m=>m.id===id)||{}).qty||0;
+  let h=`<div class="sb">${sv(I.se,20,"var(--txt2)")}<input placeholder="Cerca materiale..." oninput="DS(this.value)" value="${S.q||""}">`;
+  if(S.q)h+=`<button class="x" onclick="DS('')">✕</button>`;
+  h+=`</div>`;
 
-  // ── PRESE form ──────────────────────────────────────────────────────────
-  h+='<div id="it-prese-form-'+rid+'" class="prese-form">';
-  h+='<div style="font-size:11px;color:var(--muted);margin-bottom:5px">Numero posti in cassetta</div>';
-  h+='<div class="posti-seg" id="it-posti-'+rid+'">';
-  PRESA_POSTI.forEach(function(p,i){
-    h+='<button class="posti-btn'+(i===0?' on':'')+'" data-v="'+p+'" onclick="togPosti('+rid+',\''+p+'\',this)">'+p+'P</button>';
-  });
-  h+='</div>';
-  h+='<div style="font-size:11px;color:var(--muted);margin-bottom:5px">Tipo presa</div>';
-  h+='<select id="it-ptipo-'+rid+'" style="margin-bottom:0">';
-  h+='<option value="">— seleziona tipo —</option>';
-  PRESA_TIPI.forEach(function(t){h+='<option>'+t+'</option>';});
-  h+='</select>';
-  h+='<div class="ip55-row" id="it-ip55-'+rid+'" data-on="0" onclick="togIP55('+rid+')">';
-  h+='<div class="ip55-box"></div>';
-  h+='<span class="ip55-lbl">IP55 — non spuntato</span>';
-  h+='<span style="margin-left:auto;font-size:10px;opacity:.6">stagna</span>';
-  h+='</div>';
-  h+='</div>';
-
-  // ── OTHER categories form ──────────────────────────────────────────────
-  h+='<div id="it-other-form-'+rid+'" style="display:none">';
-  h+='<select id="it-type-'+rid+'" style="margin-bottom:0">'+buildNonPreseOpts()+'</select>';
-  h+='</div>';
-
-  // ── Common fields ──────────────────────────────────────────────────────
-  h+='<div class="add-r2" style="margin-top:8px">';
-  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  h+='<input id="it-brand-'+rid+'" placeholder="Marca" style="font-size:12px;padding:6px 8px">';
-  h+='<input id="it-model-'+rid+'" placeholder="Modello / serie" style="font-size:12px;padding:6px 8px">';
-  h+='</div>';
-  h+='<input type="number" id="it-qty-'+rid+'" value="1" min="1" max="999" placeholder="Qtà" style="font-size:12px;padding:6px 8px">';
-  h+='</div>';
-  h+='<div style="display:flex;gap:8px;margin-top:8px;align-items:center">';
-  h+='<input id="it-note-'+rid+'" placeholder="Nota (es: lato finestra, da sostituire...)" style="font-size:12px;padding:6px 8px;flex:1;margin-bottom:0">';
-  h+='<button class="btn-acc" onclick="addItem('+rid+')" style="font-size:14px;font-weight:500;flex-shrink:0">+</button>';
-  h+='</div>';
-  h+='</div>';
+  if(S.q&&S.q.length>=2){
+    const al=C.flatMap(c=>c.items.map(i=>({...i,cat:c.cat})));
+    const f=al.filter(i=>i.nome.toLowerCase().includes(S.q.toLowerCase())||i.cat.toLowerCase().includes(S.q.toLowerCase()));
+    if(!f.length)h+=`<div class="es"><div class="et">Nessun risultato per "${S.q}"</div></div>`;
+    else f.forEach(i=>{h+=iR(i,gq(i.id),lid,i.cat)});
+  }else{
+    C.forEach(c=>{
+      const o=S.co===c.cat;
+      h+=`<div class="ch ${o?"o":""}" onclick="TC('${c.cat}')"><span>${c.cat}</span><span class="cc">(${c.items.length})</span><span class="ca">›</span></div>`;
+      if(o)c.items.forEach(i=>{h+=iR(i,gq(i.id),lid)});
+    });
+  }
   return h;
 }
 
-
-function countItems(items){
-  var prese=0,luce=0,tv=0,tel=0;
-  items.forEach(function(i){
-    var t=i.type.toLowerCase();
-    // Nuove prese: "4P — Presa 2P+T 16A [IP55]"
-    var isPresaNew=/^\d+[\/]?\d*p\s*—/.test(t);
-    var isPresaOld=t.indexOf('presa')>=0&&t.indexOf('tv')<0&&t.indexOf('rj')<0&&t.indexOf('telefon')<0&&t.indexOf('hdmi')<0&&t.indexOf('sat')<0;
-    if(isPresaNew||isPresaOld) prese+=i.qty;
-    if(t.indexOf('usb')>=0&&!isPresaNew) prese+=i.qty;
-    if(t.indexOf('punto luce')>=0||t.indexOf('faretto')>=0||t.indexOf('strip')>=0||t.indexOf('emergenza')>=0||t.indexOf('segnapasso')>=0)luce+=i.qty;
-    if(!isPresaNew&&(t.indexOf('tv')>=0||t.indexOf('coass')>=0||t.indexOf('sat')>=0||t.indexOf('antenna')>=0))tv+=i.qty;
-    if(t.indexOf('rj45')>=0||t.indexOf('rj11')>=0||t.indexOf('dati')>=0||t.indexOf('telefon')>=0)tel+=i.qty;
-  });
-  return {prese:prese,luce:luce,tv:tv,tel:tel};
+function iR(it,qty,lid,ex){
+  let h=`<div class="ir"><div class="ii"><div class="in">${it.nome}</div>`;
+  const nt=(ex?ex+" · ":"")+(it.norma||"");
+  if(nt)h+=`<div class="im">${nt}</div>`;
+  h+=`</div>`;
+  if(qty)h+=`<div class="qc"><button class="qb" onclick="event.stopPropagation();uq('${lid}','${it.id}',-1)">−</button><span class="qv">${qty}</span><button class="qb" onclick="event.stopPropagation();uq('${lid}','${it.id}',1)">+</button></div>`;
+  else h+=`<button class="ab" onclick="event.stopPropagation();am('${lid}','${it.id}')">${sv(I.pl,22,"#fff")}</button>`;
+  return h+`</div>`;
 }
 
-// ── Build CEI 64-8 check panel ────────────────────────────────────────────
-function buildCeiPanel(room){
-  var ceiType=room.ceiType;
-  var lv=room.ceiLv||1;
-  var surf=room.ceiSurf||'s2';
-  var li=lv-1; // index 0,1,2
-  var open=room.ceiOpen;
-
-  var ceiTypeOpts='<option value="">— tipo CEI —</option>';
-  Object.keys(CEI).forEach(function(k){ceiTypeOpts+='<option value="'+k+'"'+(k===ceiType?' selected':'')+'>'+CEI[k].label+'</option>';});
-
-  var html='<div class="cei-panel">';
-  html+='<div class="cei-hdr'+(open?' open':'')+'" onclick="togCei('+room.id+')">';
-  html+='<div style="display:flex;align-items:center;gap:8px">';
-  html+='<span class="cei-title">CEI 64-8 Sez.37</span>';
-  if(ceiType){
-    var lvCls='l'+lv;
-    html+='<span class="lvl-badge '+lvCls+'">L'+lv+'</span>';
-    // quick overall status
-    var c=countItems(room.items);
-    var d=CEI[ceiType];
-    var preseMin=d.prese?((d.hasSurface?d.prese[surf]:d.prese.base)||[0,0,0])[li]:0;
-    var luceMin=d.luce?((d.hasSurface?d.luce[surf]:d.luce.base)||[0,0,0])[li]:0;
-    var ok=c.prese>=preseMin&&c.luce>=luceMin;
-    var partial=(c.prese>0||c.luce>0)&&(!ok);
-    html+='<span style="font-size:10px;'+(ok?'color:var(--ok)':partial?'color:var(--warn)':'color:var(--muted)')+'">'+
-      (ok?'✓ Conforme':partial?'⚠ Incompleto':'– Verificare')+'</span>';
-  }
-  html+='</div>';
-  html+='<span class="arr'+(open?' open':'')+'">&#9654;</span>';
-  html+='</div>';
-
-  if(open){
-    html+='<div class="cei-body open">';
-    // config row
-    html+='<div class="cei-config">';
-    html+='<div class="f"><div class="lbl" style="margin-bottom:4px">Tipo locale (norma)</div>';
-    html+='<select onchange="setCeiType('+room.id+',this.value)" style="font-size:11px;padding:5px 8px">'+ceiTypeOpts+'</select></div>';
-
-    if(ceiType&&CEI[ceiType].hasSurface){
-      html+='<div class="f"><div class="lbl" style="margin-bottom:4px">Superficie</div>';
-      html+='<select onchange="setCeiSurf('+room.id+',this.value)" style="font-size:11px;padding:5px 8px">';
-      html+='<option value="s1"'+(surf==='s1'?' selected':'')+'>8–12 m²</option>';
-      html+='<option value="s2"'+(surf==='s2'?' selected':'')+'>12–20 m²</option>';
-      html+='<option value="s3"'+(surf==='s3'?' selected':'')+'>oltre 20 m²</option>';
-      html+='</select></div>';
-    } else {
-      html+='<div></div>';
-    }
-
-    html+='<div class="f"><div class="lbl" style="margin-bottom:4px">Livello target</div>';
-    html+='<div class="level-seg">';
-    [1,2,3].forEach(function(lvi){
-      html+='<button class="lv-btn'+(lv===lvi?' on l'+lvi:'')+'" onclick="setCeiLv('+room.id+','+lvi+')">L'+lvi+'</button>';
-    });
-    html+='</div></div></div>'; // end cei-config
-
-    if(ceiType){
-      var d=CEI[ceiType];
-      var c=countItems(room.items);
-      var preseMin=(d.hasSurface?d.prese[surf]:d.prese.base)[li];
-      var preseExtra=d.preseExtra?((d.hasSurface?d.preseExtra[surf]:d.preseExtra.base)||[0,0,0])[li]:0;
-      var luceMin=(d.hasSurface?d.luce[surf]:d.luce.base)[li];
-      var tvMin=(d.tv?(d.hasSurface?d.tv[surf]:d.tv.base)[li]:0)||0;
-      var telMin=(d.tel?(d.hasSurface?d.tel[surf]:d.tel.base)[li]:0)||0;
-
-      html+='<div class="check-grid">';
-      html+=checkRow('Prese energia','',c.prese,preseMin);
-      if(preseExtra>0)html+=checkRow('di cui grandi elettrod.*','',null,preseExtra,'info');
-      html+=checkRow('Punti luce','',c.luce,luceMin);
-      if(tvMin>0)html+=checkRow('Presa TV / antenna','',c.tv,tvMin);
-      if(telMin>0)html+=checkRow('Presa dati / tel.','',c.tel,telMin);
-      html+='</div>';
-      html+='<div class="cei-notes">'+d.notes+'</div>';
-    } else {
-      html+='<div style="font-size:12px;color:var(--muted);padding:6px 0">Seleziona il tipo di locale per visualizzare i requisiti minimi.</div>';
-    }
-    html+='</div>'; // cei-body
-  }
-
-  html+='</div>'; // cei-panel
-  return html;
-}
-
-function checkRow(label,sub,found,req,forceClass){
-  if(req===0) return '';
-  var cls, icon;
-  if(forceClass==='info'){
-    cls='na'; icon='*';
-    return '<div class="check-row na"><span class="check-icon" style="color:var(--muted)">'+icon+'</span>'+
-      '<span class="check-label">'+label+'</span>'+
-      '<span class="check-counts" style="color:var(--muted)">min. '+req+'</span></div>';
-  }
-  if(found===null){cls='na';icon='–';}
-  else if(found>=req){cls='ok';icon='✓';}
-  else if(found>0){cls='warn';icon='⚠';}
-  else{cls='ko';icon='✗';}
-  var countHtml='';
-  if(found!==null){
-    var col=found>=req?'color:var(--ok)':found>0?'color:var(--warn)':'color:var(--err)';
-    countHtml='<span class="check-counts"><span class="found" style="'+col+'">'+found+'</span><span class="req"> / min.'+req+'</span></span>';
-  } else {
-    countHtml='<span class="check-counts" style="color:var(--muted)">min. '+req+'</span>';
-  }
-  return '<div class="check-row '+cls+'"><span class="check-icon">'+icon+'</span>'+
-    '<span class="check-label">'+label+'</span>'+countHtml+'</div>';
-}
-
-function buildOpts(){
-  var h='<option value="">— tipo elemento —</option>';
-  Object.keys(TYPES).forEach(function(cat){
-    h+='<optgroup label="'+cat+'">';
-    TYPES[cat].forEach(function(t){h+='<option>'+t+'</option>';});
-    h+='</optgroup>';
+function rI(){
+  const lid=S.loc.id,lm=S.mat[lid]||[];
+  if(!lm.length)return`<div class="es"><div class="ei">📋</div><div class="et">Nessun materiale previsto</div><div class="ed">Vai al Modulo 1 per aggiungere materiali</div></div>`;
+  const ic=glic(lid);
+  let h=`<div class="isb"><span>${ic} / ${lm.length} installati</span><span>Tocca per confermare ✓</span></div>`;
+  lm.forEach(it=>{
+    const k=lid+"_"+it.id,chk=!!S.inst[k],ins=S.inst[k];
+    h+=`<div class="cr" onclick="ti2('${lid}','${it.id}')"><div class="cb ${chk?"on":"off"}">${chk?sv(I.ck,20,"#fff"):""}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:15px;color:${chk?"var(--grn)":"var(--txt)"}">${it.nome}</div><div style="font-size:12px;color:var(--txt2);margin-top:2px">Prev: ${it.qty} ${it.um}`;
+    if(ins?.variante)h+=` <span class="vg">VARIANTE</span>`;
+    if(ins?.marchio)h+=` <span style="margin-left:8px;color:var(--pri);font-weight:600">${ins.marchio} ${ins.modello}</span>`;
+    h+=`</div></div>`;
+    if(chk)h+=`<button class="vb" onclick="event.stopPropagation();OM('${lid}','${it.id}')">${sv(I.sw,14,"var(--org)")} Dettaglia</button>`;
+    h+=`</div>`;
   });
   return h;
 }
 
-function renderRooms(){
-  var list=el('rooms-list'),empty=el('rooms-empty');
-  if(!st.rooms.length){list.innerHTML='';empty.style.display='';return;}
-  empty.style.display='none';
-  var h='';
-  st.rooms.forEach(function(room){
-    var open=!!st.open[room.id];
-    var tot=room.items.reduce(function(a,i){return a+i.qty;},0);
-    h+='<div class="room-card">';
-    h+='<div class="room-hdr'+(open?' open':'')+'" onclick="togRoom('+room.id+')">';
-    h+='<span class="arr'+(open?' open':'')+'">&#9654;</span>';
-    h+='<span class="room-name">'+esc(room.name)+'</span>';
-    if(room.items.length)h+='<span class="room-cnt">'+room.items.length+' el · '+tot+' pz</span>';
-    h+='<button class="btn-sm btn-del" onclick="event.stopPropagation();delRoom('+room.id+')" style="padding:3px 7px">Elimina</button>';
-    h+='</div>';
-    h+='<div class="room-body'+(open?' open':'')+'">';
-    if(room.items.length){
-      room.items.forEach(function(item){
-        var meta=[];
-        if(item.brand)meta.push(item.brand);
-        if(item.model)meta.push(item.model);
-        if(item.note)meta.push('<i>'+esc(item.note)+'</i>');
-        h+='<div class="item-row">';
-        h+='<div class="item-qty">'+item.qty+'x</div>';
-        h+='<div style="flex:1;min-width:0"><div class="item-type">'+esc(item.type)+'</div>';
-        if(meta.length)h+='<div class="item-meta">'+meta.join(' · ')+'</div>';
-        h+='</div>';
-        h+='<button class="btn-sm btn-del" onclick="delItem('+room.id+','+item.id+')" style="padding:3px 7px">x</button>';
-        h+='</div>';
-      });
-    }
-    // CEI 64-8 panel
-    h+=buildCeiPanel(room);
-    // add form
-    h+=buildAddForm(room.id);
-    h+='<textarea class="note-area" placeholder="Note generali sul locale..." oninput="saveNote('+room.id+',this.value)">'+esc(room.note||'')+'</textarea>';
-    h+='</div></div>';
+function rR(){
+  const tot={};Object.values(S.mat).flat().forEach(m=>{if(tot[m.id])tot[m.id].qty+=m.qty;else tot[m.id]={...m}});
+  const ar=Object.values(tot).sort((a,b)=>a.nome.localeCompare(b.nome));
+  const bc={};ar.forEach(m=>{const cn=C.find(c=>c.items.some(i=>i.id===m.id))?.cat||"Altro";if(!bc[cn])bc[cn]=[];bc[cn].push(m)});
+  if(!ar.length)return`<div class="es"><div class="ei">📄</div><div class="et">Nessun materiale aggiunto</div><div class="ed">Inizia dal sopralluogo per aggiungere materiali</div></div>`;
+  let h=`<div class="sc"><h3>📄 Riepilogo lista acquisti</h3><p><strong>Cantiere:</strong> Appartamento Rossi · Via Roma 15, Borgia (CZ)</p><p>${ar.length} voci · ${ar.reduce((s,m)=>s+m.qty,0)} pezzi/metri totali</p></div>`;
+  Object.entries(bc).forEach(([c,its])=>{
+    h+=`<div class="cd">${c}</div>`;
+    its.forEach(m=>{h+=`<div class="sr"><div class="n">${m.nome}</div><div class="q">${m.qty} ${m.um}</div></div>`});
   });
-  list.innerHTML=h;
+  h+=`<button class="gb" onclick="T('✅ PDF generato! Pronto per condivisione via WhatsApp/email')">${sv(I.dc,20,"#fff")} Genera PDF lista acquisti</button>`;
+  return h;
 }
 
-function renderSummary(){
-  var all=[];
-  st.rooms.forEach(function(r){r.items.forEach(function(i){all.push({room:r.name,i:i});});});
-  var totR=st.rooms.length,totE=all.length;
-  var totP=all.reduce(function(a,x){return a+x.i.qty;},0);
-  var totB=all.filter(function(x){return x.i.brand;}).length;
-  el('sum-stats').innerHTML=
-    '<div class="stat"><div class="stat-n">'+totR+'</div><div class="stat-l">Locali</div></div>'+
-    '<div class="stat"><div class="stat-n">'+totE+'</div><div class="stat-l">Elementi</div></div>'+
-    '<div class="stat"><div class="stat-n">'+totP+'</div><div class="stat-l">Pezzi</div></div>'+
-    '<div class="stat"><div class="stat-n">'+totB+'</div><div class="stat-l">Con marca</div></div>';
-  var byType={},roomsByType={};
-  all.forEach(function(x){
-    var t=x.i.type;byType[t]=(byType[t]||0)+x.i.qty;
-    if(!roomsByType[t])roomsByType[t]=[];
-    if(roomsByType[t].indexOf(x.room)<0)roomsByType[t].push(x.room);
-  });
-  var types=Object.keys(byType).sort(function(a,b){return byType[b]-byType[a];});
-  el('sum-types').innerHTML=types.map(function(t){
-    return '<tr><td>'+esc(t)+'</td><td style="font-size:11px">'+esc(roomsByType[t].join(', '))+'</td><td>'+byType[t]+'</td></tr>';
-  }).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:1rem">Nessun elemento registrato</td></tr>';
-  var rH='';
-  st.rooms.forEach(function(r){
-    if(!r.items.length)return;
-    rH+='<div class="sum-room-title">'+esc(r.name)+'</div>';
-    r.items.forEach(function(i){
-      var meta=[i.brand,i.model,i.note].filter(Boolean).join(' · ');
-      rH+='<div class="sum-item"><span style="font-family:var(--font-mono);color:var(--accent);min-width:28px;text-align:right;flex-shrink:0">'+i.qty+'x</span>';
-      rH+='<span style="flex:1">'+esc(i.type)+(meta?'<span style="color:var(--muted)"> — '+esc(meta)+'</span>':'')+'</span></div>';
-    });
-  });
-  el('sum-rooms-wrap').innerHTML=rH||'<div class="empty">Nessun dato inserito.</div>';
+function OM(lid,iid){const ins=S.inst[lid+"_"+iid];S.ml={lid,iid,marchio:ins?.marchio||"",modello:ins?.modello||""};R()}
+function rM(){
+  const m=S.ml,itn=(S.mat[m.lid]||[]).find(x=>x.id===m.iid)?.nome||"";
+  let h=`<div class="mo" onclick="CM()"><div class="mc" onclick="event.stopPropagation()"><div class="mt">Dettaglia materiale installato</div><div class="ms">${itn}</div><div class="fl">Marchio</div><div class="cg">`;
+  MK.forEach(b=>{h+=`<button class="cp ${m.marchio===b?"s":""}" onclick="SMK('${b}')">${b}</button>`});
+  h+=`</div><div class="fl">Modello / Codice articolo</div><input class="mi" placeholder="Es. S201C16 NA" value="${m.modello||""}" oninput="S.ml.modello=this.value"><button class="msv" onclick="SVM()">Salva dettaglio</button></div></div>`;
+  $("app").insertAdjacentHTML("beforeend",h);
 }
+function SMK(b){S.ml.marchio=b;R()}
+function CM(){S.ml=null;R()}
+function SVM(){const m=S.ml;sv2(m.lid,m.iid,{marchio:m.marchio,modello:m.modello});S.ml=null;R();T("Dettaglio salvato ✓")}
 
-function getExport(){
-  var p={name:gv('p-name'),tech:gv('p-tech'),client:gv('p-client'),date:gv('p-date'),ref:gv('p-ref')};
-  var L=[];
-  L.push('SOPRALLUOGO IMPIANTO ELETTRICO CIVILE');
-  L.push('='.repeat(42));
-  if(p.name)L.push('Progetto : '+p.name);
-  if(p.client)L.push('Cliente  : '+p.client);
-  if(p.tech)L.push('Tecnico  : '+p.tech);
-  if(p.date){var d=new Date(p.date);if(!isNaN(d))L.push('Data     : '+d.toLocaleDateString('it-IT'));}
-  if(p.ref)L.push('Rif.     : '+p.ref);
-  L.push('');
-  st.rooms.forEach(function(r){
-    if(!r.items.length&&!r.note)return;
-    var lv=r.ceiLv||1;
-    L.push('[ '+r.name.toUpperCase()+' ]'+(r.ceiType?' — CEI 64-8 L'+lv:''));
-    r.items.forEach(function(i){
-      var line='  '+i.qty+'x  '+i.type;
-      if(i.brand||i.model)line+='  ['+[i.brand,i.model].filter(Boolean).join(' ')+']';
-      if(i.note)line+='  ('+i.note+')';
-      L.push(line);
-    });
-    if(r.ceiType){
-      var c=countItems(r.items);
-      var d=CEI[r.ceiType];
-      var si=lv-1;
-      var surf=r.ceiSurf||'s2';
-      var preseMin=(d.hasSurface?d.prese[surf]:d.prese.base)[si];
-      var luceMin=(d.hasSurface?d.luce[surf]:d.luce.base)[si];
-      L.push('  [CEI 64-8 L'+lv+'] Prese: '+c.prese+'/'+(preseMin||'—')+
-        ' · Luce: '+c.luce+'/'+(luceMin||'—')+
-        (c.prese>=preseMin&&c.luce>=luceMin?' ✓':' ⚠ INCOMPLETO'));
-    }
-    if(r.note)L.push('  NOTE: '+r.note);
-    L.push('');
-  });
-  L.push('RIEPILOGO QUANTITA\'');L.push('-'.repeat(32));
-  var byType={};
-  st.rooms.forEach(function(r){r.items.forEach(function(i){byType[i.type]=(byType[i.type]||0)+i.qty;});});
-  var types=Object.keys(byType).sort(function(a,b){return byType[b]-byType[a];});
-  if(types.length)types.forEach(function(t){L.push('  '+String(byType[t]).padStart(3)+'x  '+t);});
-  else L.push('  (nessun elemento)');
-  L.push('');L.push('— Generato con Elettro Calc Pro —');
-  return L.join('\n');
-}
-function renderExport(){el('export-box').textContent=getExport();}
-function copyTxt(){
-  var txt=getExport();
-  navigator.clipboard.writeText(txt).then(function(){
-    el('copy-ok').style.display='';
-    setTimeout(function(){el('copy-ok').style.display='none';},2500);
-  }).catch(function(){
-    var ta=document.createElement('textarea');ta.value=txt;
-    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-    el('copy-ok').style.display='';
-    setTimeout(function(){el('copy-ok').style.display='none';},2500);
-  });
-}
-function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function GB(){S.scr="locali";S.loc=null;S.co=null;S.q="";R()}
+function GS(s){S.scr=s;R()}
+function SM(m){S.mod=m;S.scr="locali";S.loc=null;S.co=null;S.q="";R()}
+function SL(id){S.loc=L.find(l=>l.id===id);S.scr=S.mod===1?"catalogo":"installato";S.co=null;S.q="";R()}
+function TC(c){S.co=S.co===c?null:c;R()}
+function DS(v){S.q=v;R();const inp=document.querySelector(".sb input");if(inp){inp.focus();inp.setSelectionRange(v.length,v.length)}}
 
-el('p-date').value=new Date().toISOString().split('T')[0];
-load();
+R();
 </script>
+</body>
+</html>
