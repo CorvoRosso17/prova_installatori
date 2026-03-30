@@ -1,0 +1,806 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--panel:#181c27;--panel-b:#222738;--border:#2e3347;
+  --text:#e8eaf2;--muted:#7a80a0;
+  --accent:#5b9cf6;--accent-bg:rgba(91,156,246,.12);--accent-dim:rgba(91,156,246,.25);
+  --ok:#3ecf8e;--ok-bg:rgba(62,207,142,.10);
+  --warn:#f5a623;--warn-bg:rgba(245,166,35,.10);
+  --err:#f06060;--err-bg:rgba(240,96,96,.10);
+  --r:10px;--rs:7px;
+}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font-sans)}
+.page{min-height:100vh;display:flex;justify-content:center;padding:28px 16px 48px}
+.wrap{width:100%;max-width:520px;display:flex;flex-direction:column;gap:14px}
+.hdr{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.hico{width:40px;height:40px;background:var(--accent-bg);border:1px solid var(--accent-dim);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.ct{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.g3{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr);gap:10px}
+.f{display:flex;flex-direction:column;gap:5px}
+.lbl{font-size:11px;color:var(--muted)}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a80a0'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+option,optgroup{background:#1a1e2e}
+button{padding:8px 14px;border:1px solid var(--border);border-radius:var(--rs);background:transparent;cursor:pointer;font-size:13px;font-family:inherit;color:var(--text);transition:all .15s}
+button:hover{background:var(--panel-b)}button:active{transform:scale(.98)}
+.btn-acc{background:var(--accent-bg);color:var(--accent);border-color:var(--accent-dim)}
+.btn-sm{padding:4px 9px;font-size:11.5px}
+.btn-del{color:var(--err);border-color:rgba(240,96,96,.2)}
+.btn-del:hover{background:var(--err-bg)}
+.tabs{display:flex;gap:4px;margin-bottom:2px}
+.tab{flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--rs);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit;text-align:center;transition:all .15s}
+.tab.on{background:var(--accent-bg);border-color:var(--accent-dim);color:var(--accent);font-weight:500}
+.room-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.room-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;transition:background .15s}
+.room-hdr:hover{background:var(--panel-b)}
+.room-hdr.open{border-bottom:1px solid var(--border)}
+.room-name{font-size:14px;font-weight:500;flex:1}
+.room-cnt{font-size:11.5px;color:var(--muted);font-family:var(--font-mono)}
+.arr{font-size:11px;color:var(--muted);transition:transform .2s;display:inline-block}
+.arr.open{transform:rotate(90deg)}
+.room-body{padding:14px;display:none}
+.room-body.open{display:block}
+.item-row{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--panel-b);border-radius:var(--rs);margin-bottom:6px}
+.item-qty{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--accent);min-width:28px;text-align:right;flex-shrink:0;padding-top:1px}
+.item-type{font-size:13px;font-weight:500}
+.item-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.add-form{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-top:10px}
+.add-ct{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.add-r2{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:8px;margin-bottom:8px}
+.add-r3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 42px;gap:8px;margin-bottom:8px}
+/* CEI 64-8 panel */
+.cei-panel{margin-top:10px;border:1px solid var(--border);border-radius:var(--rs);overflow:hidden}
+.cei-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;background:var(--panel-b);border-bottom:1px solid transparent;transition:all .15s;justify-content:space-between}
+.cei-hdr:hover{opacity:.85}
+.cei-hdr.open{border-bottom-color:var(--border)}
+.cei-title{font-size:11px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+.cei-body{padding:12px;background:var(--panel-b);display:none}
+.cei-body.open{display:block}
+.cei-config{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr);gap:8px;margin-bottom:12px}
+.level-seg{display:flex;gap:2px}
+.lv-btn{flex:1;padding:5px 4px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;font-size:12px;font-family:var(--font-mono);color:var(--muted);transition:all .15s;font-weight:500}
+.lv-btn.on.l1{background:rgba(91,156,246,.15);color:var(--accent);border-color:var(--accent-dim)}
+.lv-btn.on.l2{background:rgba(62,207,142,.12);color:var(--ok);border-color:rgba(62,207,142,.3)}
+.lv-btn.on.l3{background:rgba(245,166,35,.12);color:var(--warn);border-color:rgba(245,166,35,.3)}
+.check-grid{display:flex;flex-direction:column;gap:6px}
+.check-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);font-size:12px}
+.check-row.ok{background:var(--ok-bg);border:1px solid rgba(62,207,142,.15)}
+.check-row.warn{background:var(--warn-bg);border:1px solid rgba(245,166,35,.15)}
+.check-row.ko{background:var(--err-bg);border:1px solid rgba(240,96,96,.15)}
+.check-row.na{background:var(--panel);border:1px solid var(--border);opacity:.6}
+.check-icon{font-size:13px;flex-shrink:0;width:18px}
+.check-label{flex:1;color:var(--text)}
+.check-counts{font-family:var(--font-mono);font-size:11.5px;text-align:right;flex-shrink:0}
+.check-counts .found{font-weight:500}
+.check-counts .req{opacity:.6}
+.cei-notes{margin-top:10px;font-size:11.5px;color:var(--muted);line-height:1.65;border-top:1px solid var(--border);padding-top:10px}
+.cei-notes b{color:var(--text);font-weight:500}
+.lvl-badge{padding:2px 8px;border-radius:99px;font-size:10px;font-weight:500;font-family:var(--font-mono)}
+.lvl-badge.l1{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-dim)}
+.lvl-badge.l2{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(62,207,142,.3)}
+.lvl-badge.l3{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(245,166,35,.3)}
+/* summary / export */
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.stat{background:var(--panel-b);border:1px solid var(--border);border-radius:var(--rs);padding:12px}
+.stat-n{font-size:26px;font-weight:500;font-family:var(--font-mono)}
+.stat-l{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{padding:7px 10px;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:1px solid var(--border);text-align:right;background:var(--panel-b)}
+th:first-child{text-align:left}
+td{padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);font-size:12px}
+td:first-child,td:nth-child(2){text-align:left;font-family:var(--font-sans);color:var(--muted)}
+tr:last-child td{border-bottom:none}
+.export-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:14px;font-family:var(--font-mono);font-size:12px;line-height:1.9;white-space:pre-wrap;word-break:break-word;margin-bottom:12px}
+.st{border-radius:var(--rs);padding:11px 14px;font-size:12.5px;line-height:1.5;display:flex;gap:10px;align-items:flex-start}
+.st.ok{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(62,207,142,.2)}
+.st.info{background:var(--accent-bg);color:var(--accent);border:1px solid rgba(91,156,246,.2)}
+.empty{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:13px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r)}
+.sum-room-title{font-size:13px;font-weight:500;margin:14px 0 6px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.sum-item{display:flex;gap:8px;padding:5px 8px;background:var(--panel-b);border-radius:var(--rs);font-size:12px;margin-bottom:4px}
+.note-area{resize:vertical;min-height:44px;font-size:12px;margin-top:8px}
+/* Prese form */
+.cat-sel{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.cat-btn{padding:5px 11px;border:1px solid var(--border);border-radius:99px;background:transparent;cursor:pointer;font-size:12px;font-family:inherit;color:var(--muted);transition:all .15s}
+.cat-btn.on{background:var(--accent-bg);border-color:var(--accent-dim);color:var(--accent);font-weight:500}
+.prese-form{margin-bottom:8px}
+.posti-seg{display:flex;gap:2px;margin-bottom:8px}
+.posti-btn{flex:1;padding:8px 4px;border:1px solid var(--border);border-radius:var(--rs);background:transparent;cursor:pointer;font-size:13px;font-family:var(--font-mono);color:var(--muted);font-weight:500;transition:all .15s}
+.posti-btn.on{background:var(--accent-bg);border-color:var(--accent-dim);color:var(--accent)}
+.ip55-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--panel-b);border-radius:var(--rs);cursor:pointer;margin-top:6px;font-size:12px;color:var(--muted);transition:background .15s;user-select:none}
+.ip55-row:hover{background:var(--border)}
+.ip55-row.on{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);color:var(--warn)}
+.ip55-box{width:16px;height:16px;border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .15s}
+.ip55-box.on{background:var(--warn-bg);border-color:rgba(245,166,35,.4);color:var(--warn)}
+</style>
+
+<div class="page"><div class="wrap">
+
+<div class="hdr">
+  <div class="hico">&#128221;</div>
+  <div>
+    <div style="font-size:17px;font-weight:500" id="h-title">Sopralluogo elettrico</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:2px" id="h-sub">CEI 64-8 Sez.37 · impianto civile</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="ct">Dati progetto</div>
+  <div class="g2" style="margin-bottom:10px">
+    <div class="f"><div class="lbl">Progetto / indirizzo</div><input id="p-name" placeholder="Via Roma 1, Milano" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
+    <div class="f"><div class="lbl">Tecnico</div><input id="p-tech" placeholder="Mario Rossi" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
+  </div>
+  <div class="g3">
+    <div class="f"><div class="lbl">Cliente</div><input id="p-client" placeholder="Nome cliente" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
+    <div class="f"><div class="lbl">Data</div><input id="p-date" type="date" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
+    <div class="f"><div class="lbl">Rif. #</div><input id="p-ref" placeholder="001" oninput="save()" style="font-size:12px;padding:6px 8px"></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="showV('survey',this)">Rilievo</button>
+  <button class="tab" onclick="showV('summary',this)">Riepilogo</button>
+  <button class="tab" onclick="showV('export',this)">Esporta</button>
+</div>
+
+<div id="v-survey">
+  <div class="card" style="padding:14px">
+    <div class="ct" style="margin-bottom:10px">Aggiungi locale</div>
+    <div style="display:flex;gap:8px;margin-bottom:0">
+      <select id="sel-room" style="flex:1">
+        <option value="">— locale preimpostato —</option>
+        <optgroup label="Zone giorno">
+          <option>Ingresso</option><option>Corridoio</option><option>Soggiorno</option>
+          <option>Sala da pranzo</option><option>Cucina</option><option>Cucina / pranzo</option>
+          <option>Lavanderia</option><option>Ripostiglio</option>
+        </optgroup>
+        <optgroup label="Zone notte">
+          <option>Camera da letto</option><option>Camera 2</option><option>Camera 3</option>
+          <option>Cameretta</option><option>Studio / ufficio</option>
+          <option>Bagno</option><option>Bagno 2</option><option>Bagno padronale</option>
+          <option>WC</option>
+        </optgroup>
+        <optgroup label="Esterni / tecnico">
+          <option>Terrazzo</option><option>Balcone</option><option>Giardino</option>
+          <option>Garage</option><option>Cantina / locale tecnico</option>
+          <option>Quadro elettrico generale</option>
+        </optgroup>
+      </select>
+      <input id="inp-room" placeholder="oppure nome libero" style="flex:1;font-size:12px;padding:6px 8px">
+      <button class="btn-acc" onclick="addRoom()">+ Locale</button>
+    </div>
+  </div>
+  <div id="rooms-list"></div>
+  <div id="rooms-empty" class="empty">Nessun locale aggiunto — inizia dal menu sopra.</div>
+</div>
+
+<div id="v-summary" style="display:none">
+  <div class="stat-grid" id="sum-stats"></div>
+  <div class="card" style="padding:0 0 2px">
+    <div style="padding:12px 14px 8px"><div class="ct" style="margin:0">Quantità per tipo</div></div>
+    <table><thead><tr><th>Elemento</th><th>Locali</th><th>Tot.</th></tr></thead>
+    <tbody id="sum-types"></tbody></table>
+  </div>
+  <div id="sum-rooms-wrap"></div>
+</div>
+
+<div id="v-export" style="display:none">
+  <div class="card">
+    <div class="ct">Documento da condividere</div>
+    <div class="export-box" id="export-box"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-acc" onclick="copyTxt()">Copia testo</button>
+      <button onclick="sendPrompt('Analizza questo sopralluogo e suggerisci il materiale da ordinare con quantità: \n' + getExport())">Suggerisci materiale ↗</button>
+      <button onclick="sendPrompt('Elabora un preventivo di massima per questo sopralluogo impianto elettrico civile: \n' + getExport())">Preventivo ↗</button>
+    </div>
+    <div id="copy-ok" style="font-size:12px;color:var(--ok);margin-top:8px;display:none">Copiato negli appunti</div>
+  </div>
+</div>
+
+</div></div>
+
+<script>
+// ── CEI 64-8 Sez. 37 — Tabella A Dotazioni minime ─────────────────────────
+// Fonte: CEI 64-8/3:2024, Allegato A (V3 + edizione 2024)
+// Struttura: {prese:[L1,L2,L3], luce:[L1,L2,L3], notes:'...'}
+// Per Camera/Soggiorno/Studio: dipende dalla superficie → keys s1/s2/s3
+// s1: 8≤A≤12m², s2: 12<A≤20m², s3: A>20m²
+
+var CEI = {
+  'camera':    {label:'Camera/Soggiorno/Studio', hasSurface:true,
+    prese:{s1:[4,5,5], s2:[5,7,8], s3:[6,8,10]},
+    luce: {s1:[1,2,3], s2:[1,2,3], s3:[1,4,4]},
+    tv:   {s1:[1,1,1], s2:[1,1,1], s3:[1,1,2]},
+    tel:  {s1:[1,1,1], s2:[1,1,1], s3:[1,1,1]},
+    notes:'Almeno 1 presa vicino alla porta (consigliato). Presa TV deve avere predisposizione per 6 prese energia. I punti luce a soffitto possono essere sostituiti da prese comandate.'
+  },
+  'cucina':    {label:'Cucina (con spazio pranzo)', hasSurface:false,
+    prese:{base:[4,6,7]}, preseExtra:{base:[2,2,3]},
+    luce: {base:[1,2,2]},
+    tv:   {base:[1,1,1]},
+    tel:  {base:[0,0,0]},
+    notes:'Le prese "extra" (*) sono riservate a grandi elettrodomestici (cappa, lavastoviglie, frigorifero). Predisporre presa per elettrovalvola gas. Almeno 1 presa P30 (Schuko). Circuito dedicato per piano cottura a induzione (L3).'
+  },
+  'angolo':    {label:'Angolo cottura', hasSurface:false,
+    prese:{base:[2,2,3]}, preseExtra:{base:[1,1,2]},
+    luce: {base:[1,1,1]},
+    tv:   {base:[0,0,0]},
+    tel:  {base:[0,0,0]},
+    notes:'Dotazioni ridotte rispetto alla cucina completa. Prese extra riservate a frigorifero e piano cottura.'
+  },
+  'ingresso':  {label:'Ingresso', hasSurface:false,
+    prese:{base:[1,1,1]},
+    luce: {base:[1,1,1]},
+    tv:   {base:[0,0,0]},
+    tel:  {base:[0,1,1]},
+    notes:'Punto luce obbligatorio vicino alla porta. Presa vicino alla porta (consigliata). Campanello obbligatorio per L1; videocitofono da L2.'
+  },
+  'corridoio': {label:'Corridoio', hasSurface:true,
+    prese:{s1:[1,1,1], s2:[1,1,2], s3:[1,1,2]},
+    luce: {s1:[1,1,1], s2:[1,1,1], s3:[1,1,2]},
+    tv:   {s1:[0,0,0], s2:[0,0,0], s3:[0,0,0]},
+    tel:  {s1:[0,0,0], s2:[0,0,0], s3:[0,0,0]},
+    notes:'Lunghezza ≤5m: s1. Lunghezza >5m: s2/s3. Punto luce con interruttore vicino alla porta.'
+  },
+  'bagno':     {label:'Bagno (con lavatrice)', hasSurface:false,
+    prese:{base:[2,2,2]},
+    luce: {base:[2,2,2]},
+    tv:   {base:[0,0,0]},
+    tel:  {base:[0,0,0]},
+    notes:'1 presa rasoi zona 3 (SELV 12V o trafo isolamento) + 1 presa lavatrice. 2 punti luce (soffitto + specchio). Se assente lavatrice: 1 presa. Differenziale tipo A (o F) consigliato per il circuito lavatrice.'
+  },
+  'wc':        {label:'WC / bagno senza lavatrice', hasSurface:false,
+    prese:{base:[1,1,1]},
+    luce: {base:[1,1,1]},
+    tv:   {base:[0,0,0]},
+    tel:  {base:[0,0,0]},
+    notes:'1 presa rasoi (zona 3, SELV o trafo isolamento). 1 punto luce.'
+  },
+  'lavanderia':{label:'Lavanderia / locale tecnico', hasSurface:false,
+    prese:{base:[4,4,4]},
+    luce: {base:[1,1,1]},
+    tv:   {base:[0,0,0]},
+    tel:  {base:[0,0,0]},
+    notes:'Prese dedicate per: lavatrice, asciugatrice, pompa calore ACS, altri elettrodomestici. Differenziale tipo A (o F) consigliato.'
+  },
+  'balcone':   {label:'Balcone / terrazzo', hasSurface:false,
+    prese:{base:[1,1,1]},
+    luce: {base:[1,1,1]},
+    tv:   {base:[0,0,0]},
+    tel:  {base:[0,0,0]},
+    notes:'Prese IP44. Punto luce esterno con spia di segnalazione (il comando è all\'interno e non visibile direttamente).'
+  },
+  'giardino':  {label:'Giardino / zona esterna', hasSurface:false,
+    prese:{base:[1,1,2]},
+    luce: {base:[1,1,2]},
+    tv:   {base:[0,0,0]},
+    tel:  {base:[0,0,0]},
+    notes:'Prese IP55 (uso esterno). Circuito protetto da differenziale 30mA.'
+  },
+  'ripostiglio':{label:'Ripostiglio / cantina', hasSurface:false,
+    prese:{base:[1,1,1]},
+    luce: {base:[1,1,1]},
+    tv:   {base:[0,0,0]},
+    tel:  {base:[0,0,0]},
+    notes:'Dotazione minima identica per tutti i livelli.'
+  },
+  'garage':    {label:'Garage / box auto', hasSurface:false,
+    prese:{base:[1,1,2]},
+    luce: {base:[1,1,1]},
+    tv:   {base:[0,0,0]},
+    tel:  {base:[0,0,0]},
+    notes:'Predisposizione ricarica veicoli elettrici raccomandata da L2 (CEI 64-8:2024). Prese IP44.'
+  },
+};
+
+// Mappatura nomi locali → tipo CEI
+var ROOM_MAP = {
+  'Ingresso':'ingresso','Corridoio':'corridoio',
+  'Soggiorno':'camera','Sala da pranzo':'camera',
+  'Cucina':'cucina','Cucina / pranzo':'cucina',
+  'Lavanderia':'lavanderia','Ripostiglio':'ripostiglio',
+  'Camera da letto':'camera','Camera 2':'camera','Camera 3':'camera',
+  'Cameretta':'camera','Studio / ufficio':'camera',
+  'Bagno':'bagno','Bagno 2':'bagno','Bagno padronale':'bagno','WC':'wc',
+  'Terrazzo':'balcone','Balcone':'balcone','Giardino':'giardino',
+  'Garage':'garage','Cantina / locale tecnico':'ripostiglio',
+  'Quadro elettrico generale':null,
+};
+
+// Prese: tipi normalizzati
+var PRESA_TIPI = [
+  'Presa 2P+T 10A',
+  'Presa 2P+T 16A',
+  'Presa bipasso 2P+T 10/16A',
+  'Presa UNEL 2P+T 10/16A',
+];
+var PRESA_POSTI = ['3','4','6/7'];
+
+var TYPES = {
+  'Prese':[], // gestite separatamente con form dedicato
+  'Comandi':['Interruttore 10A','Deviatore 10A','Invertitore 10A','Pulsante NA','Pulsante NC','Dimmer rotativo','Dimmer a pulsante','Interruttore bipolare 16A','Deviatore con spia','Commutatore'],
+  'Punti luce':['Punto luce soffitto','Punto luce parete','Punto luce incasso','Punto luce esterno IP44','Faretto orientabile','Strip LED','Apparecchio emergenza','Segnapasso'],
+  'Protezioni QE':['Int. mag-term. 1P','Int. mag-term. 2P','Int. mag-term. 3P+N','Differenziale tipo A','Differenziale tipo F','Differenziale tipo AC','SPD scaricatore'],
+  'Sicurezza':['Rilevatore fumo','Rilevatore gas','Rilevatore CO','PIR movimento','Rilevatore allagamento','Sirena interna','Sirena esterna','Tastiera allarme','Contatto porta','Contatto finestra','Telecamera IP','Videocitofono','Citofono audio'],
+  'Impianto speciale':['Termostato','Cronotermostato','Unità interna AC','Unità esterna AC','Pompa di calore','Punto ricarica EV 7kW','Punto ricarica EV 22kW'],
+  'Canalizzazione':['Cassetta derivazione 503','Corrugato 16mm','Corrugato 20mm','Corrugato 25mm','Tubo rigido 20mm','Canale PVC 40x25','Canale PVC 60x40','Scatola incasso 503'],
+};
+
+var st={rooms:[],open:{},ceiOpen:{}}, rId=1, iId=1;
+
+async function load(){
+  try{
+    var r=await window.storage.get('sopr-v3');
+    if(r&&r.value){
+      var d=JSON.parse(r.value);
+      st=d.st||st;rId=d.rId||1;iId=d.iId||1;
+      var p=d.p||{};
+      el('p-name').value=p.name||'';el('p-tech').value=p.tech||'';
+      el('p-client').value=p.client||'';el('p-date').value=p.date||'';el('p-ref').value=p.ref||'';
+      updHdr();
+    }
+  }catch(e){}
+  renderRooms();
+}
+
+async function save(){
+  updHdr();
+  try{
+    await window.storage.set('sopr-v3',JSON.stringify({
+      st:st,rId:rId,iId:iId,
+      p:{name:gv('p-name'),tech:gv('p-tech'),client:gv('p-client'),date:gv('p-date'),ref:gv('p-ref')}
+    }));
+  }catch(e){}
+}
+
+function updHdr(){
+  el('h-title').textContent=gv('p-name')||'Sopralluogo elettrico';
+  var p=[];
+  if(gv('p-client'))p.push(gv('p-client'));
+  if(gv('p-date')){var d=new Date(gv('p-date'));if(!isNaN(d))p.push(d.toLocaleDateString('it-IT'));}
+  el('h-sub').textContent=p.join(' · ')||'CEI 64-8 Sez.37 · impianto civile';
+}
+
+function el(id){return document.getElementById(id);}
+function gv(id){var e=el(id);return e?e.value:'';}
+
+function showV(v,btn){
+  ['v-survey','v-summary','v-export'].forEach(function(id){el(id).style.display=id==='v-'+v?'':'none';});
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  if(v==='summary')renderSummary();
+  if(v==='export')renderExport();
+}
+
+function addRoom(){
+  var sel=gv('sel-room'),custom=gv('inp-room').trim();
+  var name=custom||sel;if(!name){el('inp-room').focus();return;}
+  var id=rId++;
+  var ceiType=ROOM_MAP[name]||null;
+  st.rooms.push({id:id,name:name,items:[],note:'',ceiType:ceiType,ceiSurf:'s2',ceiLv:1,ceiOpen:false});
+  st.open[id]=true;
+  el('sel-room').value='';el('inp-room').value='';
+  save();renderRooms();
+}
+
+function delRoom(id){
+  if(!confirm('Eliminare il locale e tutti gli elementi?'))return;
+  st.rooms=st.rooms.filter(function(r){return r.id!==id;});
+  save();renderRooms();
+}
+
+function togRoom(id){st.open[id]=!st.open[id];renderRooms();}
+function togCei(id){
+  var room=st.rooms.find(function(r){return r.id===id;});
+  if(room){room.ceiOpen=!room.ceiOpen;save();renderRooms();}
+}
+
+function setCeiType(rid,val){
+  var room=st.rooms.find(function(r){return r.id===rid;});
+  if(room){room.ceiType=val||null;save();renderRooms();}
+}
+function setCeiSurf(rid,val){
+  var room=st.rooms.find(function(r){return r.id===rid;});
+  if(room){room.ceiSurf=val;save();renderRooms();}
+}
+function setCeiLv(rid,lv){
+  var room=st.rooms.find(function(r){return r.id===rid;});
+  if(room){room.ceiLv=lv;save();renderRooms();}
+}
+
+function addItem(rid){
+  var cat=gv('it-cat-'+rid);
+  var type='';
+  if(cat==='Prese'){
+    var postiEl=document.querySelector('#it-posti-'+rid+' .posti-btn.on');
+    var tipoEl=ge('it-ptipo-'+rid);
+    var ip55El=ge('it-ip55-'+rid);
+    var posti=postiEl?postiEl.dataset.v:'';
+    var ptipo=tipoEl?tipoEl.value:'';
+    if(!posti||!ptipo){if(!posti&&postiEl===null){alert('Seleziona il numero di posti.');}else if(!ptipo){ge('it-ptipo-'+rid).focus();}return;}
+    type=posti+'P — '+ptipo;
+    if(ip55El&&ip55El.dataset.on==='1') type+=' [IP55]';
+  } else {
+    type=gv('it-type-'+rid);
+    if(!type){el('it-type-'+rid).focus();return;}
+  }
+  var qty=Math.max(1,parseInt(gv('it-qty-'+rid))||1);
+  var brand=gv('it-brand-'+rid).trim(),model=gv('it-model-'+rid).trim(),note=gv('it-note-'+rid).trim();
+  var room=st.rooms.find(function(r){return r.id===rid;});if(!room)return;
+  room.items.push({id:iId++,type:type,qty:qty,brand:brand,model:model,note:note});
+  save();renderRooms();
+}
+
+function delItem(rid,iid){
+  var room=st.rooms.find(function(r){return r.id===rid;});if(!room)return;
+  room.items=room.items.filter(function(i){return i.id!==iid;});
+  save();renderRooms();
+}
+function saveNote(rid,val){var room=st.rooms.find(function(r){return r.id===rid;});if(room){room.note=val;save();}}
+
+function togPosti(rid,val,btn){
+  document.querySelectorAll('#it-posti-'+rid+' .posti-btn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+}
+function togIP55(rid){
+  var el_=ge('it-ip55-'+rid);
+  var on=el_.dataset.on==='1';
+  el_.dataset.on=on?'0':'1';
+  el_.className='ip55-row'+(on?'':' on');
+  el_.querySelector('.ip55-box').className='ip55-box'+(on?'':' on');
+  el_.querySelector('.ip55-box').textContent=on?'':'✓';
+  el_.querySelector('.ip55-lbl').textContent=on?'IP55 — non spuntato':'IP55 — installazione stagna';
+}
+function setItemCat(rid,cat,btn){
+  document.querySelectorAll('#it-catrow-'+rid+' .cat-btn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  ge('it-cat-'+rid).value=cat;
+  ge('it-prese-form-'+rid).style.display=cat==='Prese'?'':'none';
+  ge('it-other-form-'+rid).style.display=cat==='Prese'?'none':'';
+  if(cat!=='Prese'){
+    var sel=ge('it-type-'+rid);
+    sel.innerHTML='<option value="">— tipo elemento —</option>';
+    if(TYPES[cat]){TYPES[cat].forEach(function(t){var o=document.createElement('option');o.textContent=t;sel.appendChild(o);});}
+  }
+}
+
+// ── Build opts for non-prese categories ──────────────────────────────────────
+function buildNonPreseOpts(){
+  var h='<option value="">— tipo elemento —</option>';
+  Object.keys(TYPES).forEach(function(cat){
+    if(cat==='Prese')return;
+    h+='<optgroup label="'+cat+'">';
+    TYPES[cat].forEach(function(t){h+='<option>'+t+'</option>';});
+    h+='</optgroup>';
+  });
+  return h;
+}
+
+function buildAddForm(rid){
+  var cats=['Prese','Comandi','Punti luce','Protezioni QE','Sicurezza','Impianto speciale','Canalizzazione'];
+  var h='<div class="add-form">';
+  h+='<div class="add-ct">Aggiungi elemento</div>';
+  // Category selector
+  h+='<div class="cat-sel" id="it-catrow-'+rid+'">';
+  cats.forEach(function(c,i){
+    h+='<button class="cat-btn'+(i===0?' on':'')+'" onclick="setItemCat('+rid+',\''+c+'\',this)">'+c+'</button>';
+  });
+  h+='</div>';
+  h+='<input type="hidden" id="it-cat-'+rid+'" value="Prese">';
+
+  // ── PRESE form ──────────────────────────────────────────────────────────
+  h+='<div id="it-prese-form-'+rid+'" class="prese-form">';
+  h+='<div style="font-size:11px;color:var(--muted);margin-bottom:5px">Numero posti in cassetta</div>';
+  h+='<div class="posti-seg" id="it-posti-'+rid+'">';
+  PRESA_POSTI.forEach(function(p,i){
+    h+='<button class="posti-btn'+(i===0?' on':'')+'" data-v="'+p+'" onclick="togPosti('+rid+',\''+p+'\',this)">'+p+'P</button>';
+  });
+  h+='</div>';
+  h+='<div style="font-size:11px;color:var(--muted);margin-bottom:5px">Tipo presa</div>';
+  h+='<select id="it-ptipo-'+rid+'" style="margin-bottom:0">';
+  h+='<option value="">— seleziona tipo —</option>';
+  PRESA_TIPI.forEach(function(t){h+='<option>'+t+'</option>';});
+  h+='</select>';
+  h+='<div class="ip55-row" id="it-ip55-'+rid+'" data-on="0" onclick="togIP55('+rid+')">';
+  h+='<div class="ip55-box"></div>';
+  h+='<span class="ip55-lbl">IP55 — non spuntato</span>';
+  h+='<span style="margin-left:auto;font-size:10px;opacity:.6">stagna</span>';
+  h+='</div>';
+  h+='</div>';
+
+  // ── OTHER categories form ──────────────────────────────────────────────
+  h+='<div id="it-other-form-'+rid+'" style="display:none">';
+  h+='<select id="it-type-'+rid+'" style="margin-bottom:0">'+buildNonPreseOpts()+'</select>';
+  h+='</div>';
+
+  // ── Common fields ──────────────────────────────────────────────────────
+  h+='<div class="add-r2" style="margin-top:8px">';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  h+='<input id="it-brand-'+rid+'" placeholder="Marca" style="font-size:12px;padding:6px 8px">';
+  h+='<input id="it-model-'+rid+'" placeholder="Modello / serie" style="font-size:12px;padding:6px 8px">';
+  h+='</div>';
+  h+='<input type="number" id="it-qty-'+rid+'" value="1" min="1" max="999" placeholder="Qtà" style="font-size:12px;padding:6px 8px">';
+  h+='</div>';
+  h+='<div style="display:flex;gap:8px;margin-top:8px;align-items:center">';
+  h+='<input id="it-note-'+rid+'" placeholder="Nota (es: lato finestra, da sostituire...)" style="font-size:12px;padding:6px 8px;flex:1;margin-bottom:0">';
+  h+='<button class="btn-acc" onclick="addItem('+rid+')" style="font-size:14px;font-weight:500;flex-shrink:0">+</button>';
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
+
+
+function countItems(items){
+  var prese=0,luce=0,tv=0,tel=0;
+  items.forEach(function(i){
+    var t=i.type.toLowerCase();
+    // Nuove prese: "4P — Presa 2P+T 16A [IP55]"
+    var isPresaNew=/^\d+[\/]?\d*p\s*—/.test(t);
+    var isPresaOld=t.indexOf('presa')>=0&&t.indexOf('tv')<0&&t.indexOf('rj')<0&&t.indexOf('telefon')<0&&t.indexOf('hdmi')<0&&t.indexOf('sat')<0;
+    if(isPresaNew||isPresaOld) prese+=i.qty;
+    if(t.indexOf('usb')>=0&&!isPresaNew) prese+=i.qty;
+    if(t.indexOf('punto luce')>=0||t.indexOf('faretto')>=0||t.indexOf('strip')>=0||t.indexOf('emergenza')>=0||t.indexOf('segnapasso')>=0)luce+=i.qty;
+    if(!isPresaNew&&(t.indexOf('tv')>=0||t.indexOf('coass')>=0||t.indexOf('sat')>=0||t.indexOf('antenna')>=0))tv+=i.qty;
+    if(t.indexOf('rj45')>=0||t.indexOf('rj11')>=0||t.indexOf('dati')>=0||t.indexOf('telefon')>=0)tel+=i.qty;
+  });
+  return {prese:prese,luce:luce,tv:tv,tel:tel};
+}
+
+// ── Build CEI 64-8 check panel ────────────────────────────────────────────
+function buildCeiPanel(room){
+  var ceiType=room.ceiType;
+  var lv=room.ceiLv||1;
+  var surf=room.ceiSurf||'s2';
+  var li=lv-1; // index 0,1,2
+  var open=room.ceiOpen;
+
+  var ceiTypeOpts='<option value="">— tipo CEI —</option>';
+  Object.keys(CEI).forEach(function(k){ceiTypeOpts+='<option value="'+k+'"'+(k===ceiType?' selected':'')+'>'+CEI[k].label+'</option>';});
+
+  var html='<div class="cei-panel">';
+  html+='<div class="cei-hdr'+(open?' open':'')+'" onclick="togCei('+room.id+')">';
+  html+='<div style="display:flex;align-items:center;gap:8px">';
+  html+='<span class="cei-title">CEI 64-8 Sez.37</span>';
+  if(ceiType){
+    var lvCls='l'+lv;
+    html+='<span class="lvl-badge '+lvCls+'">L'+lv+'</span>';
+    // quick overall status
+    var c=countItems(room.items);
+    var d=CEI[ceiType];
+    var preseMin=d.prese?((d.hasSurface?d.prese[surf]:d.prese.base)||[0,0,0])[li]:0;
+    var luceMin=d.luce?((d.hasSurface?d.luce[surf]:d.luce.base)||[0,0,0])[li]:0;
+    var ok=c.prese>=preseMin&&c.luce>=luceMin;
+    var partial=(c.prese>0||c.luce>0)&&(!ok);
+    html+='<span style="font-size:10px;'+(ok?'color:var(--ok)':partial?'color:var(--warn)':'color:var(--muted)')+'">'+
+      (ok?'✓ Conforme':partial?'⚠ Incompleto':'– Verificare')+'</span>';
+  }
+  html+='</div>';
+  html+='<span class="arr'+(open?' open':'')+'">&#9654;</span>';
+  html+='</div>';
+
+  if(open){
+    html+='<div class="cei-body open">';
+    // config row
+    html+='<div class="cei-config">';
+    html+='<div class="f"><div class="lbl" style="margin-bottom:4px">Tipo locale (norma)</div>';
+    html+='<select onchange="setCeiType('+room.id+',this.value)" style="font-size:11px;padding:5px 8px">'+ceiTypeOpts+'</select></div>';
+
+    if(ceiType&&CEI[ceiType].hasSurface){
+      html+='<div class="f"><div class="lbl" style="margin-bottom:4px">Superficie</div>';
+      html+='<select onchange="setCeiSurf('+room.id+',this.value)" style="font-size:11px;padding:5px 8px">';
+      html+='<option value="s1"'+(surf==='s1'?' selected':'')+'>8–12 m²</option>';
+      html+='<option value="s2"'+(surf==='s2'?' selected':'')+'>12–20 m²</option>';
+      html+='<option value="s3"'+(surf==='s3'?' selected':'')+'>oltre 20 m²</option>';
+      html+='</select></div>';
+    } else {
+      html+='<div></div>';
+    }
+
+    html+='<div class="f"><div class="lbl" style="margin-bottom:4px">Livello target</div>';
+    html+='<div class="level-seg">';
+    [1,2,3].forEach(function(lvi){
+      html+='<button class="lv-btn'+(lv===lvi?' on l'+lvi:'')+'" onclick="setCeiLv('+room.id+','+lvi+')">L'+lvi+'</button>';
+    });
+    html+='</div></div></div>'; // end cei-config
+
+    if(ceiType){
+      var d=CEI[ceiType];
+      var c=countItems(room.items);
+      var preseMin=(d.hasSurface?d.prese[surf]:d.prese.base)[li];
+      var preseExtra=d.preseExtra?((d.hasSurface?d.preseExtra[surf]:d.preseExtra.base)||[0,0,0])[li]:0;
+      var luceMin=(d.hasSurface?d.luce[surf]:d.luce.base)[li];
+      var tvMin=(d.tv?(d.hasSurface?d.tv[surf]:d.tv.base)[li]:0)||0;
+      var telMin=(d.tel?(d.hasSurface?d.tel[surf]:d.tel.base)[li]:0)||0;
+
+      html+='<div class="check-grid">';
+      html+=checkRow('Prese energia','',c.prese,preseMin);
+      if(preseExtra>0)html+=checkRow('di cui grandi elettrod.*','',null,preseExtra,'info');
+      html+=checkRow('Punti luce','',c.luce,luceMin);
+      if(tvMin>0)html+=checkRow('Presa TV / antenna','',c.tv,tvMin);
+      if(telMin>0)html+=checkRow('Presa dati / tel.','',c.tel,telMin);
+      html+='</div>';
+      html+='<div class="cei-notes">'+d.notes+'</div>';
+    } else {
+      html+='<div style="font-size:12px;color:var(--muted);padding:6px 0">Seleziona il tipo di locale per visualizzare i requisiti minimi.</div>';
+    }
+    html+='</div>'; // cei-body
+  }
+
+  html+='</div>'; // cei-panel
+  return html;
+}
+
+function checkRow(label,sub,found,req,forceClass){
+  if(req===0) return '';
+  var cls, icon;
+  if(forceClass==='info'){
+    cls='na'; icon='*';
+    return '<div class="check-row na"><span class="check-icon" style="color:var(--muted)">'+icon+'</span>'+
+      '<span class="check-label">'+label+'</span>'+
+      '<span class="check-counts" style="color:var(--muted)">min. '+req+'</span></div>';
+  }
+  if(found===null){cls='na';icon='–';}
+  else if(found>=req){cls='ok';icon='✓';}
+  else if(found>0){cls='warn';icon='⚠';}
+  else{cls='ko';icon='✗';}
+  var countHtml='';
+  if(found!==null){
+    var col=found>=req?'color:var(--ok)':found>0?'color:var(--warn)':'color:var(--err)';
+    countHtml='<span class="check-counts"><span class="found" style="'+col+'">'+found+'</span><span class="req"> / min.'+req+'</span></span>';
+  } else {
+    countHtml='<span class="check-counts" style="color:var(--muted)">min. '+req+'</span>';
+  }
+  return '<div class="check-row '+cls+'"><span class="check-icon">'+icon+'</span>'+
+    '<span class="check-label">'+label+'</span>'+countHtml+'</div>';
+}
+
+function buildOpts(){
+  var h='<option value="">— tipo elemento —</option>';
+  Object.keys(TYPES).forEach(function(cat){
+    h+='<optgroup label="'+cat+'">';
+    TYPES[cat].forEach(function(t){h+='<option>'+t+'</option>';});
+    h+='</optgroup>';
+  });
+  return h;
+}
+
+function renderRooms(){
+  var list=el('rooms-list'),empty=el('rooms-empty');
+  if(!st.rooms.length){list.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+  var h='';
+  st.rooms.forEach(function(room){
+    var open=!!st.open[room.id];
+    var tot=room.items.reduce(function(a,i){return a+i.qty;},0);
+    h+='<div class="room-card">';
+    h+='<div class="room-hdr'+(open?' open':'')+'" onclick="togRoom('+room.id+')">';
+    h+='<span class="arr'+(open?' open':'')+'">&#9654;</span>';
+    h+='<span class="room-name">'+esc(room.name)+'</span>';
+    if(room.items.length)h+='<span class="room-cnt">'+room.items.length+' el · '+tot+' pz</span>';
+    h+='<button class="btn-sm btn-del" onclick="event.stopPropagation();delRoom('+room.id+')" style="padding:3px 7px">Elimina</button>';
+    h+='</div>';
+    h+='<div class="room-body'+(open?' open':'')+'">';
+    if(room.items.length){
+      room.items.forEach(function(item){
+        var meta=[];
+        if(item.brand)meta.push(item.brand);
+        if(item.model)meta.push(item.model);
+        if(item.note)meta.push('<i>'+esc(item.note)+'</i>');
+        h+='<div class="item-row">';
+        h+='<div class="item-qty">'+item.qty+'x</div>';
+        h+='<div style="flex:1;min-width:0"><div class="item-type">'+esc(item.type)+'</div>';
+        if(meta.length)h+='<div class="item-meta">'+meta.join(' · ')+'</div>';
+        h+='</div>';
+        h+='<button class="btn-sm btn-del" onclick="delItem('+room.id+','+item.id+')" style="padding:3px 7px">x</button>';
+        h+='</div>';
+      });
+    }
+    // CEI 64-8 panel
+    h+=buildCeiPanel(room);
+    // add form
+    h+=buildAddForm(room.id);
+    h+='<textarea class="note-area" placeholder="Note generali sul locale..." oninput="saveNote('+room.id+',this.value)">'+esc(room.note||'')+'</textarea>';
+    h+='</div></div>';
+  });
+  list.innerHTML=h;
+}
+
+function renderSummary(){
+  var all=[];
+  st.rooms.forEach(function(r){r.items.forEach(function(i){all.push({room:r.name,i:i});});});
+  var totR=st.rooms.length,totE=all.length;
+  var totP=all.reduce(function(a,x){return a+x.i.qty;},0);
+  var totB=all.filter(function(x){return x.i.brand;}).length;
+  el('sum-stats').innerHTML=
+    '<div class="stat"><div class="stat-n">'+totR+'</div><div class="stat-l">Locali</div></div>'+
+    '<div class="stat"><div class="stat-n">'+totE+'</div><div class="stat-l">Elementi</div></div>'+
+    '<div class="stat"><div class="stat-n">'+totP+'</div><div class="stat-l">Pezzi</div></div>'+
+    '<div class="stat"><div class="stat-n">'+totB+'</div><div class="stat-l">Con marca</div></div>';
+  var byType={},roomsByType={};
+  all.forEach(function(x){
+    var t=x.i.type;byType[t]=(byType[t]||0)+x.i.qty;
+    if(!roomsByType[t])roomsByType[t]=[];
+    if(roomsByType[t].indexOf(x.room)<0)roomsByType[t].push(x.room);
+  });
+  var types=Object.keys(byType).sort(function(a,b){return byType[b]-byType[a];});
+  el('sum-types').innerHTML=types.map(function(t){
+    return '<tr><td>'+esc(t)+'</td><td style="font-size:11px">'+esc(roomsByType[t].join(', '))+'</td><td>'+byType[t]+'</td></tr>';
+  }).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:1rem">Nessun elemento registrato</td></tr>';
+  var rH='';
+  st.rooms.forEach(function(r){
+    if(!r.items.length)return;
+    rH+='<div class="sum-room-title">'+esc(r.name)+'</div>';
+    r.items.forEach(function(i){
+      var meta=[i.brand,i.model,i.note].filter(Boolean).join(' · ');
+      rH+='<div class="sum-item"><span style="font-family:var(--font-mono);color:var(--accent);min-width:28px;text-align:right;flex-shrink:0">'+i.qty+'x</span>';
+      rH+='<span style="flex:1">'+esc(i.type)+(meta?'<span style="color:var(--muted)"> — '+esc(meta)+'</span>':'')+'</span></div>';
+    });
+  });
+  el('sum-rooms-wrap').innerHTML=rH||'<div class="empty">Nessun dato inserito.</div>';
+}
+
+function getExport(){
+  var p={name:gv('p-name'),tech:gv('p-tech'),client:gv('p-client'),date:gv('p-date'),ref:gv('p-ref')};
+  var L=[];
+  L.push('SOPRALLUOGO IMPIANTO ELETTRICO CIVILE');
+  L.push('='.repeat(42));
+  if(p.name)L.push('Progetto : '+p.name);
+  if(p.client)L.push('Cliente  : '+p.client);
+  if(p.tech)L.push('Tecnico  : '+p.tech);
+  if(p.date){var d=new Date(p.date);if(!isNaN(d))L.push('Data     : '+d.toLocaleDateString('it-IT'));}
+  if(p.ref)L.push('Rif.     : '+p.ref);
+  L.push('');
+  st.rooms.forEach(function(r){
+    if(!r.items.length&&!r.note)return;
+    var lv=r.ceiLv||1;
+    L.push('[ '+r.name.toUpperCase()+' ]'+(r.ceiType?' — CEI 64-8 L'+lv:''));
+    r.items.forEach(function(i){
+      var line='  '+i.qty+'x  '+i.type;
+      if(i.brand||i.model)line+='  ['+[i.brand,i.model].filter(Boolean).join(' ')+']';
+      if(i.note)line+='  ('+i.note+')';
+      L.push(line);
+    });
+    if(r.ceiType){
+      var c=countItems(r.items);
+      var d=CEI[r.ceiType];
+      var si=lv-1;
+      var surf=r.ceiSurf||'s2';
+      var preseMin=(d.hasSurface?d.prese[surf]:d.prese.base)[si];
+      var luceMin=(d.hasSurface?d.luce[surf]:d.luce.base)[si];
+      L.push('  [CEI 64-8 L'+lv+'] Prese: '+c.prese+'/'+(preseMin||'—')+
+        ' · Luce: '+c.luce+'/'+(luceMin||'—')+
+        (c.prese>=preseMin&&c.luce>=luceMin?' ✓':' ⚠ INCOMPLETO'));
+    }
+    if(r.note)L.push('  NOTE: '+r.note);
+    L.push('');
+  });
+  L.push('RIEPILOGO QUANTITA\'');L.push('-'.repeat(32));
+  var byType={};
+  st.rooms.forEach(function(r){r.items.forEach(function(i){byType[i.type]=(byType[i.type]||0)+i.qty;});});
+  var types=Object.keys(byType).sort(function(a,b){return byType[b]-byType[a];});
+  if(types.length)types.forEach(function(t){L.push('  '+String(byType[t]).padStart(3)+'x  '+t);});
+  else L.push('  (nessun elemento)');
+  L.push('');L.push('— Generato con Elettro Calc Pro —');
+  return L.join('\n');
+}
+function renderExport(){el('export-box').textContent=getExport();}
+function copyTxt(){
+  var txt=getExport();
+  navigator.clipboard.writeText(txt).then(function(){
+    el('copy-ok').style.display='';
+    setTimeout(function(){el('copy-ok').style.display='none';},2500);
+  }).catch(function(){
+    var ta=document.createElement('textarea');ta.value=txt;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    el('copy-ok').style.display='';
+    setTimeout(function(){el('copy-ok').style.display='none';},2500);
+  });
+}
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+el('p-date').value=new Date().toISOString().split('T')[0];
+load();
+</script>
